@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Moodify - 로그인</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <div class="left-section">
+            <h1 class="logo">Moodify</h1>
+            <p class="tagline">오늘의 기분으로 오늘의 음악을 만나보세요</p>
+        </div>
+
+        <div class="right-section">
+            <form class="login-form" action="/api/auth/login" method="POST">
+                <div class="input-group">
+                    <input 
+                        type="text" 
+                        class="input-field" 
+                        name="username" 
+                        placeholder="아이디" 
+                        required
+                    >
+                </div>
+
+                <div class="input-group">
+                    <input 
+                        type="password" 
+                        class="input-field" 
+                        name="password" 
+                        placeholder="비밀번호" 
+                        required
+                    >
+                </div>
+
+                <button type="submit" class="login-button">로그인</button>
+
+                <div class="signup-link">
+                    <a href="/signup">회원가입</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</body>
+</html>
