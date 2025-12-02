@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 회원가입</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="signup-page">
+  <div class="signup-container-center">
+    <!-- 상단 텍스트 -->
+    <div class="signup-header">
+      <h1 class="signup-title">Moodify</h1>
+      <p class="signup-subtitle">회원가입을 통해 추천 음악을 즐겨보세요</p>
+    </div>
+
+    <!-- 회원가입 폼 박스 -->
+    <div class="signup-main">
+      <form class="signup-form" id="signupForm">
+        <!-- 닉네임 -->
+        <input 
+          type="text" 
+          class="signup-input" 
+          placeholder="닉네임" 
+          name="nickname"
+          required
+        />
+        
+        <!-- 아이디 + 중복 확인 -->
+        <div class="input-with-button">
+          <input 
+            type="text" 
+            class="signup-input-inline" 
+            placeholder="아이디" 
+            name="username"
+            id="username"
+            required
+          />
+          <button type="button" class="check-button" id="checkDuplicate">
+            중복 확인
+          </button>
+        </div>
+
+        <!-- 비밀번호 -->
+        <input 
+          type="password" 
+          class="signup-input" 
+          placeholder="비밀번호" 
+          name="password"
+          id="password"
+          required
+        />
+
+        <!-- 비밀번호 확인 -->
+        <input 
+          type="password" 
+          class="signup-input" 
+          placeholder="비밀번호 확인" 
+          name="passwordConfirm"
+          id="passwordConfirm"
+          required
+        />
+
+        <!-- 회원가입 버튼 -->
+        <button type="submit" class="signup-button">
+          회원가입
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/signup.js"></script>
+</body>
+</html>

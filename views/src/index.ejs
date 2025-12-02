@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 오늘의 기분</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <%- include('../frame/header') %>
+
+  <div class="main-container">
+    <!-- 날짜 카드 -->
+    <div class="mood-card">
+      <div class="date-section">
+        <h2 class="current-date" id="currentDate"></h2>
+        <p class="mood-prompt">오늘의 감정을 선택해 주세요</p>
+      </div>
+
+      <!-- 이모지 선택 영역 -->
+      <div class="emoji-container">
+        <button class="emoji-button" data-mood="happy" aria-label="행복해요">
+          <span class="emoji">😊</span>
+        </button>
+        <button class="emoji-button" data-mood="love" aria-label="사랑해요">
+          <span class="emoji">😍</span>
+        </button>
+        <button class="emoji-button" data-mood="sleep" aria-label="졸려요">
+          <span class="emoji">😴</span>
+        </button>
+        <button class="emoji-button" data-mood="crying" aria-label="우울해요">
+          <span class="emoji">😭</span>
+        </button>
+        <button class="emoji-button" data-mood="angry" aria-label="화나요">
+          <span class="emoji">😠</span>
+        </button>
+        <button class="emoji-button" data-mood="excited" aria-label="신나요">
+          <span class="emoji">🤩</span>
+        </button>
+      </div>
+
+      <!-- 음악 들으러 가기 버튼 -->
+      <button class="music-button" id="musicButton">
+        음악 들으러 가기 →
+      </button>
+    </div>
+  </div>
+
+  <script src="/js/index.js"></script>
+</body>
+</html>

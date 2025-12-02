@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 로그인</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body class="login-page">
+  <div class="login-container-center">
+    <!-- 상단 텍스트 -->
+    <div class="login-header">
+      <h1 class="login-title">Moodify</h1>
+      <p class="login-subtitle">오늘의 기분으로 오늘의 음악을 만나보세요</p>
+    </div>
+
+    <!-- CD + 로그인 박스 -->
+    <div class="login-main">
+      <!-- 회전하는 LP판 + 턴테이블 바늘 -->
+      <div class="cd-disc-container">
+        <div class="cd-disc">
+          <div class="cd-hole"></div>
+          <div class="cd-shine"></div>
+        </div>
+        <!-- 턴테이블 바늘 -->
+        <div class="tonearm">
+          <div class="stylus"></div>
+        </div>
+      </div>
+      <!-- 로그인 폼 -->
+      <form class="login-form" id="loginForm">
+        <input 
+          type="text" 
+          class="login-input" 
+          placeholder="아이디" 
+          name="nickname"
+          required
+        />
+        <input 
+          type="password" 
+          class="login-input" 
+          placeholder="비밀번호" 
+          name="password"
+          required
+        />
+        <button type="submit" class="login-button">
+          로그인
+        </button>
+
+        
+
+        <a href="signup" class="register-link">회원가입</a>
+      </form>
+    </div>
+  </div>
+
+  <script src="/js/login.js"></script>
+</body>
+</html>
