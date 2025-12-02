@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 마이페이지</title>
+  <link rel="stylesheet" href="/css/style_mypage.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <%- include('../frame/header_mypage') %>
+
+  <div class="mypage-container">
+    <!-- 프로필 섹션 -->
+    <div class="profile-section">
+      <div class="profile-card">
+        <!-- 프로필 아이콘 -->
+        <div class="profile-icon">
+          <i class="fas fa-user"></i>
+        </div>
+        
+        <!-- 닉네임 -->
+        <h2 class="nickname">닉네임</h2>
+      </div>
+    </div>
+
+    <!-- 메뉴 리스트 -->
+    <div class="menu-section">
+      <a href="/info" class="menu-item">
+        <span class="menu-text">내 정보 수정</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+
+      <a href="/history" class="menu-item">
+        <span class="menu-text">히스토리</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+
+      <a href="/favorites" class="menu-item">
+        <span class="menu-text">저장한 음악</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+
+      <a href="/settings" class="menu-item">
+        <span class="menu-text">설정</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+
+      <a href="/qna" class="menu-item">
+        <span class="menu-text">Q&A</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+
+      <a href="/login" class="menu-item logout">
+        <span class="menu-text">탈퇴하기</span>
+        <i class="fas fa-chevron-right"></i>
+      </a>
+    </div>
+  </div>
+
+</body>
+</html>

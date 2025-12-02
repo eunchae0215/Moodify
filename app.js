@@ -29,9 +29,24 @@ app.get('/signup', (req, res) => {
   res.render('src/signup');
 });
 
-// 음악재생 페이지 - 카드
+// 음악재생 페이지
 app.get('/music', (req, res) => {
   res.render('src/music_card');
+});
+
+// 마이페이지
+app.get('/mypage', (req, res) => {
+  res.render('src/mypage');
+});
+
+// 내정보수정
+app.get('/info', (req, res) => {
+  res.render('src/info');
+});
+
+// 히스토리
+app.get('/history', (req, res) => {
+  res.render('src/history');
 });
 
 // 서버 시작
