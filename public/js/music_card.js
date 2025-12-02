@@ -1,20 +1,28 @@
 // 햄버거 버튼으로 리스트 토글
 const hamburgerMenu = document.getElementById('hamburgerMenu');
 const listSectionOverlay = document.getElementById('listSectionOverlay');
+const closeListBtn = document.getElementById('closeListBtn');
+const musicContainer = document.querySelector('.music-container');
 const musicItemsOverlay = document.querySelectorAll('.music-item-overlay');
 const playItemBtnsOverlay = document.querySelectorAll('.play-item-btn-overlay');
 const addItemBtnsOverlay = document.querySelectorAll('.add-item-btn-overlay');
 
 let isListVisible = false;
 
+// 햄버거 버튼 - 리스트 열기
 hamburgerMenu.addEventListener('click', () => {
-  isListVisible = !isListVisible;
-  
-  if (isListVisible) {
-    listSectionOverlay.classList.add('visible');
-  } else {
-    listSectionOverlay.classList.remove('visible');
-  }
+  isListVisible = true;
+  listSectionOverlay.classList.add('visible');
+  musicContainer.classList.add('list-open');
+  document.querySelector('.music-page').classList.add('list-active'); 
+});
+
+// 닫기 버튼 - 리스트 닫기
+closeListBtn.addEventListener('click', () => {
+  isListVisible = false;
+  listSectionOverlay.classList.remove('visible');
+  musicContainer.classList.remove('list-open');
+  document.querySelector('.music-page').classList.remove('list-active');
 });
 
 // 음악 플레이어 요소

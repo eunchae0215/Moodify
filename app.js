@@ -34,11 +34,6 @@ app.get('/music', (req, res) => {
   res.render('src/music_card');
 });
 
-// 음악재생 페이지 - 리스트
-app.get('/list', (req, res) => {
-  res.render('src/music_list');
-});
-
 // 서버 시작
 app.listen(PORT, () => {
   console.log(`서버 실행 중`);
