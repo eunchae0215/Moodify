@@ -1,7 +1,11 @@
 const express = require('express');
+const dbConnect=require('./config/dbConnect');
+
 const path = require('path');
 const app = express();
 const PORT = 3000;
+
+dbConnect();
 
 // JSON 파싱 미들웨어 추가
 app.use(express.json());

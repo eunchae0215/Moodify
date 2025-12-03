@@ -6,14 +6,14 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background: #E8EDE4;
+  background: #DDE7DD;
   min-height: 100vh;
   overflow: hidden;
 }
 
 .container {
   text-align: center;
-  color: white;
+  color: #DDE7DD;
 }
 
 h1 {
@@ -27,7 +27,7 @@ p {
 
 /* Header Styles */
 .header {
-  background-color: #E8EDE4;
+  background-color: #DDE7DD;
   padding: 15px 0;
   position: fixed;
   top: 0;
@@ -50,7 +50,7 @@ p {
   text-decoration: none;
   font-size: 35px;
   font-weight: bold;
-  color: #5F6F65;
+  color: #709269;
 }
 
 .nav {
@@ -60,24 +60,24 @@ p {
 }
 
 .nav-link {
-  color: #8A9A8E;
+  color: #709269;
   text-decoration: none;
   font-size: 17px;
   transition: color 0.3s;
 }
 
 .nav-link:hover {
-  color: #5F6F65;
+  color: #151F0F;
 }
 
 .nav-divider {
-  color: #C9D5CC;
+  color: #709269;
   font-size: 17px;
 }
 
 /* Login Page Styles */
 .login-page {
-  background-color: #D4E7D2;
+  background-color: #DDE7DD;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -101,19 +101,19 @@ p {
 .login-title {
   font-size: 48px;
   font-weight: bold;
-  color: #5F6F65;
+  color: #709269;
   margin-bottom: 10px;
 }
 
 .login-subtitle {
   font-size: 16px;
-  color: #6F7F73;
+  color: #151F0F;
   line-height: 1.6;
 }
 
 /* CD + 로그인 폼 박스 */
 .login-main {
-  background: #8B9D87;
+  background: #709269;
   padding: 30px 40px;
   border-radius: 20px;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
@@ -291,8 +291,8 @@ p {
   border: none;
   border-radius: 10px;
   font-size: 15px;
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #333;
+  background-color: #DDE7DD;
+  color: #151F0F;
   transition: all 0.3s;
 }
 
@@ -302,7 +302,7 @@ p {
 
 .login-input:focus {
   outline: none;
-  background-color: #fff;
+  background-color: #DDE7DD;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
@@ -311,8 +311,8 @@ p {
   padding: 15px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2a3a2a 0%, #1a2a1a 100%);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -333,7 +333,7 @@ p {
 
 .register-link {
   text-align: center;
-  color: rgba(255, 255, 255, 0.75);
+  color: #DDE7DD;
   font-size: 14px;
   text-decoration: none;
   margin-top: 5px;
@@ -384,7 +384,7 @@ p {
 
 /* Signup Page Styles */
 .signup-page {
-  background-color: #D4E7D2;
+  background-color: #DDE7DD;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -408,19 +408,19 @@ p {
 .signup-title {
   font-size: 48px;
   font-weight: bold;
-  color: #5F6F65;
+  color: #709269;
   margin-bottom: 10px;
 }
 
 .signup-subtitle {
   font-size: 16px;
-  color: #6F7F73;
+  color: #151F0F;
   line-height: 1.6;
 }
 
 /* 회원가입 폼 박스 */
 .signup-main {
-  background: #8B9D87;
+  background: #709269;
   padding: 75px 40px;
   border-radius: 20px;
   box-shadow: 0 10px 10px rgba(0, 0, 0, 0.4);
@@ -439,8 +439,8 @@ p {
   border: none;
   border-radius: 10px;
   font-size: 15px;
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #333;
+  background-color: #DDE7DD;
+  color: #151F0F;
   transition: all 0.3s;
 }
 
@@ -450,7 +450,7 @@ p {
 
 .signup-input:focus {
   outline: none;
-  background-color: #fff;
+  background-color: #DDE7DD;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
@@ -467,8 +467,8 @@ p {
   border: none;
   border-radius: 10px;
   font-size: 15px;
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #333;
+  background-color: #DDE7DD;
+  color: #151F0F;
   transition: all 0.3s;
 }
 
@@ -478,7 +478,7 @@ p {
 
 .signup-input-inline:focus {
   outline: none;
-  background-color: #fff;
+  background-color: #DDE7DD;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
@@ -486,8 +486,8 @@ p {
   padding: 20px 20px;
   border: none;
   border-radius: 10px;
-  background-color: #5F6F65;
-  color: white;
+  background-color: #151F0F;
+  color: #DDE7DD;
   font-size: 14px;
   font-weight: bold;
   cursor: pointer;
@@ -509,8 +509,8 @@ p {
   padding: 15px;
   border: none;
   border-radius: 10px;
-  background: linear-gradient(135deg, #2a3a2a 0%, #1a2a1a 100%);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
@@ -559,7 +559,7 @@ body {
 
 /* 감정 선택 카드 */
 .mood-card {
-  background: linear-gradient(135deg, #6B8E6F 0%, #8B9D87 100%);
+  background: #709269;
   border-radius: 20px;
   padding: 30px 60px;
   max-width: 1400px;
@@ -576,13 +576,13 @@ body {
 .current-date {
   font-size: 40px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin-bottom: 15px;
 }
 
 .mood-prompt {
   font-size: 20px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #DDE7DD;
 }
 
 /* 이모지 컨테이너 */
@@ -595,7 +595,7 @@ body {
 
 /* 이모지 버튼 */
 .emoji-button {
-  background: rgba(255, 255, 255, 0.9);
+  background: #DDE7DD;
   border: 4px solid transparent;
   border-radius: 50%;
   width: 110px;
@@ -617,7 +617,7 @@ body {
 .emoji-button:hover {
   transform: translateY(-5px) scale(1.05);
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-  background: white;
+  background: #DDE7DD;
 }
 
 .emoji-button:hover .emoji {
@@ -625,13 +625,8 @@ body {
 }
 
 .emoji-button.selected {
-  border-color: #FFD700;
-  background: white;
-  box-shadow: 0 0 0 3px rgba(255, 215, 0, 0.3);
-}
-
-.emoji-button.selected .emoji {
-  animation: bounce 0.5s ease;
+  background: #151F0F;
+  box-shadow: 0 0 0 5px rgba(145, 136, 13, 0.3);
 }
 
 @keyframes bounce {
@@ -645,8 +640,8 @@ body {
   margin-left: auto;
   display: block;  
   padding: 18px;
-  background: linear-gradient(135deg, #2a3a2a 0%, #1a2a1a 100%);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   border: none;
   border-radius: 12px;
   font-size: 20px;
@@ -738,8 +733,8 @@ body {
 
 /* Music Card Page Styles */
 .music-page {
-  min-height: 80%;
-  background: linear-gradient(135deg, #E8EDE4 0%, #D4E7D2 100%);
+  min-height:80%;
+  background: #DDE7DD;
   padding-top: 30px;
   position: relative;
 }
@@ -764,7 +759,7 @@ body {
 }
 
 .music-page .hamburger-menu i {
-  color: black;
+  color: #151F0F;
   font-size: 24px;
 }
 
@@ -800,7 +795,7 @@ body {
 }
 
 .player-card {
-  background: linear-gradient(135deg, rgba(107, 142, 111, 0.95) 0%, rgba(139, 157, 135, 0.95) 100%);
+  background: #709269;
   border-radius: 25px;
   padding: 40px 35px;
   width: 350px;
@@ -821,7 +816,7 @@ body {
 
 .album-art-bg i {
   font-size: 100px;
-  color: rgba(255, 255, 255, 0.5);
+  color: #DDE7DD;
 }
 
 /* 노래 정보 */
@@ -833,13 +828,13 @@ body {
 .song-title {
   font-size: 24px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin-bottom: 8px;
 }
 
 .song-artist {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #DDE7DD;
 }
 
 /* 재생 컨트롤 */
@@ -852,15 +847,14 @@ body {
 }
 
 .control-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+  background-color: #709269;
+  border: transparent;
   border-radius: 50%;
   cursor: pointer;
   transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .prev-btn, .next-btn {
@@ -874,16 +868,16 @@ body {
 }
 
 .control-btn i {
-  color: #2a3a2a;
-  font-size: 20px;
+  color: #DDE7DD;
+  font-size: 40px;
 }
 
 .play-btn i {
-  font-size: 26px;
+  font-size: 45px;
 }
 
 .control-btn:hover {
-  background: white;
+  background: #709269;
   transform: scale(1.1);
 }
 
@@ -896,7 +890,7 @@ body {
 
 .time-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #DDE7DD;
   font-weight: 500;
   min-width: 40px;
 }
@@ -931,7 +925,7 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
+  background: #DDE7DD;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
@@ -940,7 +934,7 @@ body {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
+  background: #DDE7DD;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -951,7 +945,7 @@ body {
   left: 0;
   top: 0;
   height: 100%;
-  background: white;
+  background: #DDE7DD;
   border-radius: 3px;
   pointer-events: none;
   width: 0%;
@@ -1035,12 +1029,12 @@ body {
 .thumbnail-box {
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, rgba(107, 142, 111, 0.3) 0%, rgba(139, 157, 135, 0.3) 100%);
+  background: rgba(139, 157, 135, 0.3);
   border-radius: 15px;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
   backdrop-filter: blur(5px);
   border: 2px solid rgba(255, 255, 255, 0.3);
   transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
@@ -1060,14 +1054,14 @@ body {
 }
 
 .carousel-item.center .thumbnail-box {
-  background: linear-gradient(135deg, rgba(107, 142, 111, 0.95) 0%, rgba(139, 157, 135, 0.95) 100%);
+  background: #DDE7DD;
   box-shadow: 0 15px 40px rgba(0, 0, 0, 0.5);
-  border: 3px solid rgba(255, 255, 255, 0.8);
+  border: 3px solid #DDE7DD;
 }
 
 .carousel-item.center .thumbnail-box i {
   font-size: 90px;
-  color: white;
+  color: rgba(32, 46, 37, 0.623);
 }
 
 /* 왼쪽/오른쪽 회전 방향 - 거리 기반 */
@@ -1111,7 +1105,7 @@ body {
   overflow-y: auto;
   padding: 20px;
   padding-bottom: 20px; 
-  background: rgba(107, 142, 111, 0.95);
+  background: #709269;
   backdrop-filter: blur(10px);
   border-radius: 20px 0 0 20px;
   box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
@@ -1152,7 +1146,7 @@ body {
 
 .close-list-btn i {
   font-size: 24px;
-  color: white;
+  color: #DDE7DD;
   transition: transform 0.3s ease;
 }
 
@@ -1236,7 +1230,7 @@ body {
 .music-title-overlay {
   font-size: 15px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin-bottom: 3px;
   white-space: nowrap;
   overflow: hidden;
@@ -1245,7 +1239,7 @@ body {
 
 .music-artist-overlay {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #DDE7DD;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1274,7 +1268,7 @@ body {
 
 .play-item-btn-overlay i,
 .add-item-btn-overlay i {
-  color: white;
+  color: #DDE7DD;
   font-size: 16px;
 }
 

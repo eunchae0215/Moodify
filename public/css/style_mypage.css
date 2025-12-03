@@ -6,7 +6,7 @@
 
 body {
   font-family: 'Arial', sans-serif;
-  background: #E8EDE4;
+  background: #DDE7DD;
   min-height: 100vh;
   padding-top: 70px;
   overflow-y: auto !important;
@@ -14,7 +14,7 @@ body {
 
 .container {
   text-align: center;
-  color: white;
+  color: #DDE7DD;
 }
 
 h1 {
@@ -28,7 +28,7 @@ p {
 
 /* Header Styles */
 .header {
-  background-color: #E8EDE4;
+  background-color: #DDE7DD;
   padding: 15px 0;
   position: fixed;
   top: 0;
@@ -51,7 +51,7 @@ p {
   text-decoration: none;
   font-size: 35px;
   font-weight: bold;
-  color: #5F6F65;
+  color: #709269;
 }
 
 .nav {
@@ -61,14 +61,14 @@ p {
 }
 
 .nav-link {
-  color: #8A9A8E;
+  color: #709269;
   text-decoration: none;
   font-size: 17px;
   transition: color 0.3s;
 }
 
 .nav-link:hover {
-  color: #5F6F65;
+  color: #151F0F;
 }
 
 /* 마이페이지 컨테이너 */
@@ -80,7 +80,7 @@ p {
 
 /* 프로필 섹션 */
 .profile-card {
-  background: rgba(139, 157, 135, 0.9);
+  background: #709269;
   border-radius: 20px 20px 0 0;
   padding: 50px 30px 30px;
   text-align: center;
@@ -90,7 +90,7 @@ p {
 .profile-icon {
   width: 100px;
   height: 100px;
-  background: white;
+  background: #DDE7DD;
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -101,19 +101,19 @@ p {
 
 .profile-icon i {
   font-size: 50px;
-  color: #5F6F65;
+  color: #151F0F;
 }
 
 .nickname {
   font-size: 28px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin-bottom: 0;
 }
 
 /* 메뉴 섹션 */
 .menu-section {
-  background: rgba(139, 157, 135, 0.9);
+  background: #709269;
   border-radius: 0 0 20px 20px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
 }
@@ -123,7 +123,7 @@ p {
   justify-content: space-between;
   align-items: center;
   padding: 20px 30px;
-  color: white;
+  color: #DDE7DD;
   text-decoration: none;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2);
   transition: all 0.3s ease;
@@ -150,7 +150,7 @@ p {
 
 .menu-item i {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #DDE7DD;
   transition: all 0.3s ease;
 }
 
@@ -227,7 +227,7 @@ p {
 }
 
 .info-card {
-  background: rgba(139, 157, 135, 0.9);
+  background: #709269;
   border-radius: 20px;
   padding: 40px 35px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -236,7 +236,7 @@ p {
 .info-title {
   font-size: 32px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   text-align: center;
   margin-bottom: 35px;
 }
@@ -257,8 +257,8 @@ p {
   border: none;
   border-radius: 12px;
   font-size: 16px;
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #333;
+  background-color: #DDE7DD;
+  color: #151F0F;
   transition: all 0.3s ease;
 }
 
@@ -268,19 +268,19 @@ p {
 
 .info-input:focus {
   outline: none;
-  background-color: white;
+  background-color: #DDE7DD;
   box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.3);
 }
 
 /* 읽기 전용 (아이디) */
 .info-input.readonly {
-  background-color: rgba(95, 111, 101, 0.3);
-  color: rgba(255, 255, 255, 0.8);
+  background-color: rgba(60, 78, 67, 0.3);
+  color: #DDE7DD;
   cursor: not-allowed;
 }
 
 .info-input.readonly::placeholder {
-  color: rgba(255, 255, 255, 0.6);
+  color: #DDE7DD;
 }
 
 /* 수정하기 버튼 */
@@ -290,8 +290,8 @@ p {
   margin-top: 15px;
   border: none;
   border-radius: 12px;
-  background: linear-gradient(135deg, #2a3a2a 0%, #1a2a1a 100%);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   font-size: 18px;
   font-weight: bold;
   cursor: pointer;
@@ -365,7 +365,7 @@ p {
 }
 
 .calendar-card {
-  background: rgba(139, 157, 135, 0.9);
+  background: #709269;
   border-radius: 20px;
   padding: 25px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
@@ -386,8 +386,8 @@ p {
   border-radius: 10px;
   font-size: 16px;
   font-weight: bold;
-  background: rgba(95, 111, 101, 0.8);
-  color: white;
+  background: #151f0fa6;
+  color: #DDE7DD;
   cursor: pointer;
   transition: all 0.3s ease;
   appearance: none;
@@ -407,11 +407,6 @@ p {
   flex: 1;
 }
 
-.year-select:hover,
-.month-select:hover {
-  background-color: rgba(95, 111, 101, 0.9);
-}
-
 .year-select:focus,
 .month-select:focus {
   outline: none;
@@ -428,7 +423,7 @@ p {
   grid-template-columns: repeat(7, 1fr);
   margin-bottom: 8px;
   padding: 12px 0;
-  background: rgba(255, 255, 255, 0.15);
+  background: #dde7dd4b;
   border-radius: 15px;
 }
 
@@ -436,7 +431,7 @@ p {
   text-align: center;
   font-size: 15px;
   font-weight: bold;
-  color: rgba(255, 255, 255, 0.9);
+  color: #DDE7DD;
   padding: 5px;
 }
 
@@ -445,7 +440,7 @@ p {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 5px;
-  background: rgba(255, 255, 255, 0.1);
+  background: #dde7dd4b;
   border-radius: 15px;
   padding: 12px;
 }
@@ -457,7 +452,7 @@ p {
   justify-content: center;
   font-size: 18px;
   font-weight: 500;
-  color: rgba(255, 255, 255, 0.9);
+  color: #DDE7DD;
   border-radius: 100px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -490,7 +485,7 @@ p {
 /* 선택된 날짜 */
 .calendar-day.selected {
   background: rgba(255, 255, 255, 0.4);
-  border: 2px solid white;
+  border: 2px solid #DDE7DD;
   font-weight: bold;
   color: white;
 }
@@ -519,7 +514,7 @@ p {
   right: 0;
   width: 1000px;
   height: 83%;
-  background: rgba(107, 142, 111, 0.95);
+  background: #709269;
   backdrop-filter: blur(10px);
   border-radius: 20px 0 0 20px;
   box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
@@ -536,7 +531,7 @@ p {
 
 .history-card-btn{
   background: transparent;
-  border: 3px solid white;
+  border: 3px solid #DDE7DD;
   border-radius: 50%;
   width: 30px;
   height: 30px;
@@ -550,7 +545,7 @@ p {
 }
 
 .history-card-btn i {
-  color: white;
+  color: #DDE7DD;
   font-size: 15px;
 }
 
@@ -579,7 +574,7 @@ p {
 
 .close-history-list-btn i {
   font-size: 24px;
-  color: white;
+  color: #DDE7DD;
   transition: transform 0.3s ease;
 }
 
@@ -626,12 +621,13 @@ p {
 .history-date-title {
   font-size: 20px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin: 0;
 }
 
 .history-mood-emoji {
   font-size: 32px;
+  margin-right: 20px;
 }
 
 /* 음악 아이템 */
@@ -677,7 +673,7 @@ p {
 .history-music-title {
   font-size: 16px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -686,7 +682,7 @@ p {
 
 .history-music-artist {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #DDE7DD;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -716,7 +712,7 @@ p {
 
 .history-play-btn i,
 .history-add-btn i {
-  color: white;
+  color: #DDE7DD;
   font-size: 18px;
 }
 
@@ -734,7 +730,7 @@ p {
   transform: translateX(-50%) translateY(400px);
   width: 458px;
   height: 575px;
-  background: linear-gradient(135deg, rgba(107, 142, 111, 0.95) 0%, rgba(139, 157, 135, 0.95) 100%);
+  background: #709269;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -768,7 +764,7 @@ p {
 .album-placeholder {
   width: 100%;
   aspect-ratio: 1;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.25) 100%);
+  background: #DDE7DD;
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -777,7 +773,7 @@ p {
 
 .album-placeholder i {
   font-size: 100px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(32, 46, 37, 0.623);
 }
 
 /* 재생 정보 */
@@ -789,7 +785,7 @@ p {
 .player-title {
   font-size: 24px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin: 0 0 8px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -798,7 +794,7 @@ p {
 
 .player-artist {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #DDE7DD;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -815,37 +811,34 @@ p {
 }
 
 .player-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+  background-color: #709269;
+  border: transparent;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .player-btn i {
-  color: #2a3a2a;
-  font-size: 20px;
+  color: #DDE7DD;
+  font-size: 40px;
 }
 
 .play-btn-main {
   width: 65px;
   height: 65px;
-  background: rgba(255, 255, 255, 0.9);
+  background: #709269;
 }
 
 .play-btn-main i {
-  font-size: 26px;
-  color: #2a3a2a;
+  font-size: 45px;
+  color: #DDE7DD;
 }
 
 .player-btn:hover {
-  background: white;
+  background: #709269;
   transform: scale(1.1);
 }
 
@@ -858,7 +851,7 @@ p {
 
 .time-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #DDE7DD;
   font-weight: 500;
   min-width: 40px;
 }
@@ -893,7 +886,7 @@ p {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
+  background: #DDE7DD;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
 }
@@ -902,7 +895,7 @@ p {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
+  background: #DDE7DD;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -913,7 +906,7 @@ p {
   left: 0;
   top: 0;
   height: 100%;
-  background: white;
+  background: #DDE7DD;
   border-radius: 3px;
   pointer-events: none;
   width: 0%;
@@ -960,7 +953,7 @@ p {
 
 .close-player-btn i {
   font-size: 24px;
-  color: white;
+  color: #DDE7DD;
   transition: transform 0.3s ease;
 }
 
@@ -1046,10 +1039,11 @@ p {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
-  background: rgba(107, 142, 111, 0.4);
-  padding: 30px;
+  background: #709269;
+  padding: 50px;
   border-radius: 25px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+
 }
 
 /* 개별 폴더 */
@@ -1063,13 +1057,14 @@ p {
 
 /* 폴더 카드 */
 .folder-card {
-  background: rgba(255, 255, 255, 0.95);
+  background: #DDE7DD;
   border-radius: 0 20px 20px 20px;
-  padding: 30px 20px 20px 20px;
+  padding: 18px 15px 15px 15px; 
+  margin: 5px 0px;             
+  gap: 12px;  
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 20px;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.15);
   transition: all 0.3s ease;
   position: relative;
@@ -1086,7 +1081,7 @@ p {
   left: 0;
   width: 170px;
   height: 30px;
-  background: rgba(255, 255, 255, 0.95);
+  background: #DDE7DD;
   clip-path: polygon(0% 100%, 100% 100%, 70% 0%, 0% 0%);
   border-radius: 15px 15px 0px 0px;
 }
@@ -1104,8 +1099,8 @@ p {
 
 /* 폴더 버튼 */
 .folder-btn {
-  background: rgba(95, 111, 101, 0.9);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   border: none;
   border-radius: 12px;
   padding: 12px 24px;
@@ -1191,7 +1186,7 @@ p {
   transform: translateX(-40%);
   width: 458px;
   height: 575px;
-  background: linear-gradient(135deg, rgba(107, 142, 111, 0.95) 0%, rgba(139, 157, 135, 0.95) 100%);
+  background: #709269;
   backdrop-filter: blur(10px);
   border-radius: 20px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
@@ -1216,7 +1211,7 @@ p {
 .fav-album-placeholder {
   width: 100%;
   aspect-ratio: 1;
-  background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.25) 100%);
+  background: #DDE7DD;
   border-radius: 15px;
   display: flex;
   align-items: center;
@@ -1225,7 +1220,7 @@ p {
 
 .fav-album-placeholder i {
   font-size: 100px;
-  color: rgba(255, 255, 255, 0.5);
+  color: rgba(32, 46, 37, 0.623);
 }
 
 /* 재생 정보 */
@@ -1237,7 +1232,7 @@ p {
 .fav-player-title {
   font-size: 24px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin: 0 0 8px 0;
   white-space: nowrap;
   overflow: hidden;
@@ -1246,7 +1241,7 @@ p {
 
 .fav-player-artist {
   font-size: 16px;
-  color: rgba(255, 255, 255, 0.8);
+  color: #DDE7DD;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -1263,37 +1258,34 @@ p {
 }
 
 .fav-player-btn {
-  background: rgba(255, 255, 255, 0.9);
-  border: none;
+  background-color: #709269;
+  border: transparent;
   border-radius: 50%;
-  width: 50px;
-  height: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s ease;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .fav-player-btn i {
-  color: #2a3a2a;
-  font-size: 20px;
+  color: #DDE7DD;
+  font-size: 40px;
 }
 
 .fav-play-btn-main {
   width: 65px;
   height: 65px;
-  background: rgba(255, 255, 255, 0.9);
+  background: #709269;
 }
 
 .fav-play-btn-main i {
-  font-size: 26px;
-  color: #2a3a2a;
+  font-size: 45px;
+  color: #DDE7DD;
 }
 
 .fav-player-btn:hover {
-  background: white;
+  background: #709269;
   transform: scale(1.1);
 }
 
@@ -1306,7 +1298,7 @@ p {
 
 .fav-time-text {
   font-size: 13px;
-  color: rgba(255, 255, 255, 0.9);
+  color: #DDE7DD;
   font-weight: 500;
   min-width: 40px;
 }
@@ -1343,7 +1335,7 @@ p {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
+  background: #DDE7DD;
   cursor: pointer;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
   margin-top: -4px;
@@ -1353,7 +1345,7 @@ p {
   width: 14px;
   height: 14px;
   border-radius: 50%;
-  background: white;
+  background: #DDE7DD;
   cursor: pointer;
   border: none;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
@@ -1377,7 +1369,7 @@ p {
   left: 0;
   top: 0;
   height: 100%;
-  background: white;
+  background: #DDE7DD;
   border-radius: 3px;
   pointer-events: none;
   width: 0%;
@@ -1391,7 +1383,7 @@ p {
   right: 0;
   width: 1000px;
   height: 83%;
-  background: rgba(107, 142, 111, 0.95);
+  background: #709269;
   backdrop-filter: blur(10px);
   border-radius: 20px 0 0 20px;
   box-shadow: -5px 0 20px rgba(0, 0, 0, 0.3);
@@ -1410,7 +1402,7 @@ p {
 .favorites-music-title {
   font-size: 24px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin: 0;
 }
 
@@ -1491,7 +1483,7 @@ p {
 .favorites-music-item-title {
   font-size: 16px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin-bottom: 5px;
   white-space: nowrap;
   overflow: hidden;
@@ -1500,7 +1492,7 @@ p {
 
 .favorites-music-item-artist {
   font-size: 14px;
-  color: rgba(255, 255, 255, 0.7);
+  color: #DDE7DD;
   margin: 0;
   white-space: nowrap;
   overflow: hidden;
@@ -1530,7 +1522,7 @@ p {
 
 .favorites-play-btn i,
 .favorites-add-btn i {
-  color: white;
+  color: #DDE7DD;
   font-size: 18px;
 }
 
@@ -1602,7 +1594,7 @@ p {
 
 /* 설정 카드 */
 .settings-card {
-  background: rgba(107, 142, 111, 0.9);
+  background: #709269;
   border-radius: 25px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -1621,7 +1613,7 @@ p {
 .settings-title {
   font-size: 32px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin: 0;
 }
 
@@ -1635,7 +1627,7 @@ p {
 
 .settings-label {
   font-size: 18px;
-  color: white;
+  color: #DDE7DD;
   font-weight: 500;
 }
 
@@ -1678,13 +1670,13 @@ p {
   width: 26px;
   left: 4px;
   bottom: 4px;
-  background-color: white;
+  background-color: #DDE7DD;
   transition: 0.4s;
   border-radius: 50%;
 }
 
 .toggle-switch input:checked + .toggle-slider {
-  background-color: rgba(50, 60, 50, 0.9);
+  background-color: #151F0F;
 }
 
 .toggle-switch input:checked + .toggle-slider:before {
@@ -1693,7 +1685,7 @@ p {
 
 /* 삭제 버튼 */
 .delete-btn {
-  background: rgba(255, 255, 255, 0.9);
+  background: #DDE7DD;
   color: #b85c5c;
   border: none;
   border-radius: 12px;
@@ -1717,8 +1709,8 @@ p {
 /* 저장하기 버튼 */
 .save-btn {
   width: 100%;
-  background: rgba(50, 60, 50, 0.9);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   border: none;
   border-radius: 15px;
   padding: 18px;
@@ -1763,7 +1755,7 @@ p {
 
 /* 모달 컨텐츠 */
 .modal-content {
-  background: rgba(230, 235, 230, 0.98);
+  background: #DDE7DD;
   border: 2px solid #666;
   border-radius: 15px;
   padding: 50px 40px;
@@ -1781,7 +1773,7 @@ p {
 .modal-title {
   font-size: 28px;
   font-weight: bold;
-  color: #2a2a2a;
+  color: #151F0F;
   margin: 0 0 20px 0;
   text-align: center;
 }
@@ -1812,8 +1804,8 @@ p {
 }
 
 .continue-btn {
-  background: rgba(95, 111, 101, 0.9);
-  color: white;
+  background: #709269;
+  color: #DDE7DD;
 }
 
 .continue-btn:hover {
@@ -1925,7 +1917,7 @@ p {
 }
 
 .qna-card {
-  background: rgba(107, 142, 111, 0.9);
+  background: #709269;
   border-radius: 15px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   overflow: hidden;
@@ -1939,7 +1931,7 @@ p {
 .qna-title {
   font-size: 32px;
   font-weight: bold;
-  color: white;
+  color: #DDE7DD;
   margin: 0;
 }
 
@@ -1957,8 +1949,8 @@ p {
   border: none;
   border-radius: 15px;
   font-size: 18px;
-  background-color: rgba(255, 255, 255, 0.95);
-  color: #333;
+  background-color: #DDE7DD;
+  color: #151F0F;
   transition: all 0.3s;
   display: block;
   white-space: pre-wrap;
@@ -1978,8 +1970,8 @@ p {
 /* 보내기 버튼 */
 .qna-submit-btn {
   width: 100%;
-  background: rgba(50, 60, 50, 0.9);
-  color: white;
+  background: #151F0F;
+  color: #DDE7DD;
   border: none;
   border-radius: 15px;
   padding: 18px;
