@@ -15,7 +15,7 @@ app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 
 // 메인 페이지
-app.get('/', (req, res) => {
+app.get('/index', (req, res) => {
   res.render('src/index');
 });
 
@@ -47,6 +47,33 @@ app.get('/info', (req, res) => {
 // 히스토리
 app.get('/history', (req, res) => {
   res.render('src/history');
+});
+
+// 저장한 음악
+app.get('/favorites', (req, res) => {
+  res.render('src/favorites');
+});
+
+app.get('/musiclist', (req, res) => {
+  const mood = req.query.mood || 'happy';
+  
+  // 나중에 DB에서 해당 감정의 음악 리스트 가져오기
+  // const musicList = await getMusicByMood(mood);
+  
+  res.render('src/favorites_music', {
+    mood: mood
+    // musicList: musicList  // DB 연결 후 추가
+  });
+});
+
+// 설정
+app.get('/settings', (req, res) => {
+  res.render('src/settings');
+});
+
+// q&A
+app.get('/qna', (req, res) => {
+  res.render('src/qna');
 });
 
 // 서버 시작

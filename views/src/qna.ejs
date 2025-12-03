@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 설정</title>
+  <link rel="stylesheet" href="/css/style_mypage.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <%- include('../frame/header_mypage') %>
+
+  <div class="qna-container">
+    <div class="qna-card">
+
+      <!-- Q&A 페이지 제목 -->
+      <div class="qna-header">
+        <h1 class="qna-title">Q & A</h1>
+      </div>
+
+      <!-- Q&A 입력 영역 -->
+      <form id="qnaForm" class="qna-form">
+        <textarea
+            class="qna-input"
+            name="qna"
+            id="qnaContent"
+            placeholder="사이트에 대한 궁금한 점이나 피드백을 보내주세요."
+            wrap="soft"
+            required
+        ></textarea>
+
+        <!-- 제출 버튼 -->
+        <div class="qna-footer">
+          <button type="submit" class="qna-submit-btn" id="qnaSubmitBtn">보내기</button>
+        </div>
+      </form>
+
+    </div>
+  </div>
+
+  <script>
+    // Q&A 제출 처리
+    document.getElementById('qnaForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const content = document.getElementById('qnaContent').value;
+
+      // TODO: 서버로 Q&A 내용 전달하는 fetch 추가 예정
+      console.log("전송된 Q&A 내용:", content);
+
+      alert('문의가 성공적으로 전송되었습니다!');
+
+      // 전송 후 입력창 초기화
+      document.getElementById('qnaContent').value = "";
+    });
+  </script>
+  <!--
+  <script src="/js/qna.js"></script>
+  -->
+</body>
+</html>

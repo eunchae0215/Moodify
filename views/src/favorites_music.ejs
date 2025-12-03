@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 저장한 음악</title>
+  <link rel="stylesheet" href="/css/style_mypage.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <%- include('../frame/header_mypage') %>
+  <div class="favorites-container">
+    <!-- 음악 플레이어 카드 -->
+    <div class="fav-music-player-card" id="favMusicPlayerCard">
+    
+      <div class="fav-player-album-art">
+        <div class="fav-album-placeholder">
+          <i class="fas fa-music"></i>
+        </div>
+      </div>
+      <div class="fav-player-info">
+        <h3 class="fav-player-title">노래 제목</h3>
+        <p class="fav-player-artist">가수명</p>
+      </div>
+      <div class="fav-player-controls">
+        <button class="fav-player-btn fav-prev-btn">
+          <i class="fas fa-step-backward"></i>
+        </button>
+        <button class="fav-player-btn fav-play-btn-main">
+          <i class="fas fa-play"></i>
+        </button>
+        <button class="fav-player-btn fav-next-btn">
+          <i class="fas fa-step-forward"></i>
+        </button>
+      </div>
+      <!-- 재생바 -->
+      <div class="fav-progress-bar-section">
+        <span class="fav-time-text" id="favCurrentTime">0:00</span>
+        <div class="fav-progress-bar-wrapper">
+          <input 
+            type="range" 
+            class="fav-progress-bar" 
+            id="favProgressBar"
+            min="0" 
+            max="100" 
+            value="0"
+          >
+          <div class="fav-progress-fill" id="favProgressFill"></div>
+        </div>
+        <span class="fav-time-text" id="favTotalTime">0:00</span>
+      </div>
+    </div>
+
+    <!-- 음악 리스트 오버레이 -->
+    <div class="favorites-music-overlay" id="favoritesMusicOverlay">
+      <!-- 리스트 헤더 -->
+      <div class="favorites-music-header">
+        <h2 class="favorites-music-title" id="favoritesMusicTitle">기쁨의 Moodify</h2>
+      </div>
+
+      <!-- 스크롤 가능한 리스트 영역 -->
+      <div class="favorites-music-scroll">
+        <!-- 음악 리스트 -->
+        <div class="favorites-music-list" id="favoritesMusicList">
+          <!-- 음악 아이템 예시 (나중에 서버에서 동적으로 생성) -->
+          <div class="favorites-music-item">
+            <div class="favorites-music-thumbnail">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="favorites-music-details">
+              <h3 class="favorites-music-item-title">노래 제목1</h3>
+              <p class="favorites-music-item-artist">가수명</p>
+            </div>
+            <div class="favorites-music-actions">
+              <button class="favorites-play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="favorites-add-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="favorites-music-item">
+            <div class="favorites-music-thumbnail">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="favorites-music-details">
+              <h3 class="favorites-music-item-title">노래 제목2</h3>
+              <p class="favorites-music-item-artist">가수명</p>
+            </div>
+            <div class="favorites-music-actions">
+              <button class="favorites-play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="favorites-add-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="favorites-music-item">
+            <div class="favorites-music-thumbnail">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="favorites-music-details">
+              <h3 class="favorites-music-item-title">노래 제목3</h3>
+              <p class="favorites-music-item-artist">가수명</p>
+            </div>
+            <div class="favorites-music-actions">
+              <button class="favorites-play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="favorites-add-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="favorites-music-item">
+            <div class="favorites-music-thumbnail">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="favorites-music-details">
+              <h3 class="favorites-music-item-title">노래 제목4</h3>
+              <p class="favorites-music-item-artist">가수명</p>
+            </div>
+            <div class="favorites-music-actions">
+              <button class="favorites-play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="favorites-add-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+
+          <div class="favorites-music-item">
+            <div class="favorites-music-thumbnail">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="favorites-music-details">
+              <h3 class="favorites-music-item-title">노래 제목5</h3>
+              <p class="favorites-music-item-artist">가수명</p>
+            </div>
+            <div class="favorites-music-actions">
+              <button class="favorites-play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="favorites-add-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+          
+          <div class="favorites-music-item">
+            <div class="favorites-music-thumbnail">
+              <i class="fas fa-music"></i>
+            </div>
+            <div class="favorites-music-details">
+              <h3 class="favorites-music-item-title">노래 제목6</h3>
+              <p class="favorites-music-item-artist">가수명</p>
+            </div>
+            <div class="favorites-music-actions">
+              <button class="favorites-play-btn">
+                <i class="fas fa-play"></i>
+              </button>
+              <button class="favorites-add-btn">
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
+  </div>
+
+  <script src="/js/favorites_music.js"></script>
+</body>
+</html>

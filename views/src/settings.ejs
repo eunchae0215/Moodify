@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 설정</title>
+  <link rel="stylesheet" href="/css/style_mypage.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <%- include('../frame/header_mypage') %>
+
+  <div class="settings-container">
+    <div class="settings-card">
+      <!-- 설정 제목 -->
+      <div class="settings-header">
+        <h1 class="settings-title">설정</h1>
+      </div>
+
+      <!-- 구분선 -->
+      <div class="settings-divider"></div>
+      <!-- 설정 항목들 -->
+      <div class="settings-items">
+        <!-- 자동 음악 재생 -->
+        <div class="settings-item">
+          <span class="settings-label">자동 음악 재생</span>
+          <label class="toggle-switch">
+            <input type="checkbox" id="autoPlayToggle">
+            <span class="toggle-slider"></span>
+          </label>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="settings-divider"></div>
+
+        <!-- 모든 데이터 삭제 -->
+        <div class="settings-item">
+          <span class="settings-label">모든 데이터 삭제</span>
+          <button class="delete-btn" id="deleteDataBtn">삭제</button>
+        </div>
+
+        <div class="settings-empty-container"></div>
+      </div>
+
+      <!-- 저장하기 버튼 -->
+      <div class="settings-footer">
+        <button class="save-btn" id="saveBtn">저장하기</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 확인 모달 -->
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-content">
+      <h2 class="modal-title">삭제하시겠습니까?</h2>
+      <p class="modal-text">저장된 모든 음악 기록, 감정 로그, 재생 목록이 영구적으로 삭제됩니다. 삭제된 데이터는 복구할 수 없으며, 추천 알고리즘이 초기화됩니다. 계속 진행하시겠습니까?</p>
+      <div class="modal-buttons">
+        <button class="modal-btn continue-btn" id="continueBtn">돌아가기</button>
+        <button class="modal-btn delete-btn-modal" id="confirmDeleteBtn">삭제하기</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/settings.js"></script>
+</body>
+</html>

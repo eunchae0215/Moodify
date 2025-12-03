@@ -46,7 +46,8 @@ p {
   align-items: center;
 }
 
-.logo {
+.logo-link{
+  text-decoration: none;
   font-size: 35px;
   font-weight: bold;
   color: #5F6F65;

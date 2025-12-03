@@ -1,3 +1,12 @@
+// 자동 재생 설정 확인 함수
+function isAutoPlayEnabled() {
+  const autoPlay = localStorage.getItem('moodify_auto_play');
+  const result = autoPlay === null || autoPlay === 'true';
+  console.log('[AutoPlay Check] localStorage value:', autoPlay);
+  console.log('[AutoPlay Check] Result:', result ? 'ENABLED' : 'DISABLED');
+  return result;
+}
+
 // 햄버거 버튼으로 리스트 토글
 const hamburgerMenu = document.getElementById('hamburgerMenu');
 const listSectionOverlay = document.getElementById('listSectionOverlay');
@@ -61,6 +70,19 @@ function init() {
   setTimeout(() => {
     scrollToIndex(0);
     update3DEffect();
+    
+    // 자동 재생 체크
+    console.log('[Music Card] 자동재생 체크 시작');
+    if (isAutoPlayEnabled()) {
+      console.log('[Music Card] 자동 재생 시작');
+      setTimeout(() => {
+        if (songs.length > 0) {
+          playSong();
+        }
+      }, 500);
+    } else {
+      console.log('[Music Card] 자동 재생 비활성화됨');
+    }
   }, 100);
 }
 
@@ -74,7 +96,14 @@ function setupListOverlay() {
       pauseSong();
       loadSong(index);
       scrollToIndex(index);
-      playSong();
+      
+      console.log('[Music Card List] 재생 버튼 클릭');
+      if (isAutoPlayEnabled()) {
+        console.log('[Music Card List] 자동 재생 시작');
+        playSong();
+      } else {
+        console.log('[Music Card List] 자동 재생 비활성화 - 수동 재생 필요');
+      }
     });
   });
   

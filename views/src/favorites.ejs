@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Moodify - 저장한 음악</title>
+  <link rel="stylesheet" href="/css/style_mypage.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+  <%- include('../frame/header_mypage') %>
+
+  <div class="favorites-container">
+    <div class="mood-folders-grid">
+      <!-- 행복한 폴더 -->
+      <div class="mood-folder" data-mood="happy">
+        <div class="folder-card">
+          <div class="folder-emoji">😊</div>
+          <button class="folder-btn">→ 17곡 들으러 가기</button>
+        </div>
+      </div>
+
+      <!-- 사랑 폴더 -->
+      <div class="mood-folder" data-mood="love">
+        <div class="folder-card">
+          <div class="folder-emoji">😍</div>
+          <button class="folder-btn">→ 17곡 들으러 가기</button>
+        </div>
+      </div>
+
+      <!-- 졸린 폴더 -->
+      <div class="mood-folder" data-mood="sleep">
+        <div class="folder-card">
+          <div class="folder-emoji">😴</div>
+          <button class="folder-btn">→ 17곡 들으러 가기</button>
+        </div>
+      </div>
+
+      <!-- 우울한 폴더 -->
+      <div class="mood-folder" data-mood="crying">
+        <div class="folder-card">
+          <div class="folder-emoji">😭</div>
+          <button class="folder-btn">→ 17곡 들으러 가기</button>
+        </div>
+      </div>
+
+      <!-- 화난 폴더 -->
+      <div class="mood-folder" data-mood="angry">
+        <div class="folder-card">
+          <div class="folder-emoji">😠</div>
+          <button class="folder-btn">→ 17곡 들으러 가기</button>
+        </div>
+      </div>
+
+      <!-- 신난 폴더 -->
+      <div class="mood-folder" data-mood="excited">
+        <div class="folder-card">
+          <div class="folder-emoji">🤩</div>
+          <button class="folder-btn">→ 17곡 들으러 가기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="/js/favorites.js"></script>
+</body>
+</html>

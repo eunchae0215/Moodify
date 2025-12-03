@@ -1,3 +1,12 @@
+// 자동 재생 설정 확인 함수
+function isAutoPlayEnabled() {
+  const autoPlay = localStorage.getItem('moodify_auto_play');
+  const result = autoPlay === null || autoPlay === 'true';
+  console.log('[AutoPlay Check] localStorage value:', autoPlay);
+  console.log('[AutoPlay Check] Result:', result ? 'ENABLED' : 'DISABLED');
+  return result;
+}
+
 // HTML이 완전히 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
   // 현재 날짜
@@ -165,80 +174,29 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // 재생 버튼 클릭 이벤트 (이벤트 위임)
-  document.body.addEventListener('click', (e) => {
-    // 재생 버튼 클릭
-    if (e.target.closest('.history-play-btn')) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const playBtn = e.target.closest('.history-play-btn');
-      const musicItem = playBtn.closest('.history-music-item');
-      
-      if (!musicItem) {
-        console.log('음악 아이템을 찾을 수 없습니다');
-        return;
-      }
-      
-      // 음악 아이템의 인덱스 찾기
-      const allMusicItems = document.querySelectorAll('.history-music-item');
-      const index = Array.from(allMusicItems).indexOf(musicItem);
-      
-      // 음악 정보 가져오기
-      const titleElement = musicItem.querySelector('.history-music-title');
-      const artistElement = musicItem.querySelector('.history-music-artist');
-      
-      if (!titleElement || !artistElement) {
-        console.log('음악 정보를 찾을 수 없습니다');
-        return;
-      }
-      
-      const title = titleElement.textContent;
-      const artist = artistElement.textContent;
-      
-      console.log('재생 버튼 클릭됨:', title, '-', artist);
-      
-      // 이전 곡 일시정지
-      pauseSong();
-      
-      // 곡 로드
-      currentIndex = index;
-      loadSong(index);
-      
-      // 재생 카드 표시
-      if (!isPlayerVisible) {
-        isPlayerVisible = true;
-        musicPlayerCard.classList.add('visible');
-      }
-      
-      // 자동 재생
-      setTimeout(() => playSong(), 100);
-    }
-  });
-
   // 곡 로드
   function loadSong(index) {
     if (index < 0 || index >= songs.length || songs.length === 0) return;
-  
+    
     currentIndex = index;
     const song = songs[index];
-  
-    playerTitle.textContent = song.title;
-    playerArtist.textContent = song.artist;
+    
+    if (playerTitle) playerTitle.textContent = song.title;
+    if (playerArtist) playerArtist.textContent = song.artist;
     duration = song.duration;
     currentTime = 0;
-  
-    // 시간 텍스트 업데이트 추가
+    
+    // 시간 텍스트 업데이트
     const currentTimeEl = document.getElementById('currentTime');
     const totalTimeEl = document.getElementById('totalTime');
-  
+    
     if (currentTimeEl) {
       currentTimeEl.textContent = formatTime(0);
     }
     if (totalTimeEl) {
       totalTimeEl.textContent = formatTime(duration);
     }
-  
+    
     if (progressBar) {
       progressBar.max = duration;
       progressBar.value = 0;
@@ -246,7 +204,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (progressFill) {
       progressFill.style.width = '0%';
     }
-  
+    
     // 리스트 하이라이트 업데이트
     updateListHighlight(index);
   }
@@ -301,34 +259,94 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // 진행률 업데이트
-function updateProgress() {
-  // 시간 텍스트 업데이트 추가
-  const currentTimeEl = document.getElementById('currentTime');
-  const totalTimeEl = document.getElementById('totalTime');
-  
-  if (currentTimeEl) {
-    currentTimeEl.textContent = formatTime(currentTime);
+  function updateProgress() {
+    // 시간 텍스트 업데이트
+    const currentTimeEl = document.getElementById('currentTime');
+    const totalTimeEl = document.getElementById('totalTime');
+    
+    if (currentTimeEl) {
+      currentTimeEl.textContent = formatTime(currentTime);
+    }
+    if (totalTimeEl) {
+      totalTimeEl.textContent = formatTime(duration);
+    }
+    
+    if (progressBar) {
+      progressBar.value = currentTime;
+    }
+    if (progressFill) {
+      const percentage = (currentTime / duration) * 100;
+      progressFill.style.width = `${percentage}%`;
+    }
   }
-  if (totalTimeEl) {
-    totalTimeEl.textContent = formatTime(duration);
-  }
-  
-  if (progressBar) {
-    progressBar.value = currentTime;
-  }
-  if (progressFill) {
-    const percentage = (currentTime / duration) * 100;
-    progressFill.style.width = `${percentage}%`;
-  }
-}
 
-// 시간 포맷 함수 추가
-function formatTime(seconds) {
-  if (isNaN(seconds)) return '0:00';
-  const mins = Math.floor(seconds / 60);
-  const secs = Math.floor(seconds % 60);
-  return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-}
+  // 시간 포맷 함수
+  function formatTime(seconds) {
+    if (isNaN(seconds)) return '0:00';
+    const mins = Math.floor(seconds / 60);
+    const secs = Math.floor(seconds % 60);
+    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
+  }
+
+  // 재생 버튼 클릭 이벤트 (이벤트 위임)
+  document.body.addEventListener('click', (e) => {
+    // 재생 버튼 클릭
+    if (e.target.closest('.history-play-btn')) {
+      e.preventDefault();
+      e.stopPropagation();
+      
+      const playBtn = e.target.closest('.history-play-btn');
+      const musicItem = playBtn.closest('.history-music-item');
+      
+      if (!musicItem) {
+        console.log('음악 아이템을 찾을 수 없습니다');
+        return;
+      }
+      
+      // 음악 아이템의 인덱스 찾기
+      const allMusicItems = document.querySelectorAll('.history-music-item');
+      const index = Array.from(allMusicItems).indexOf(musicItem);
+      
+      // 음악 정보 가져오기
+      const titleElement = musicItem.querySelector('.history-music-title');
+      const artistElement = musicItem.querySelector('.history-music-artist');
+      
+      if (!titleElement || !artistElement) {
+        console.log('음악 정보를 찾을 수 없습니다');
+        return;
+      }
+      
+      const title = titleElement.textContent;
+      const artist = artistElement.textContent;
+      
+      console.log('재생 버튼 클릭됨:', title, '-', artist);
+      
+      // 이전 곡 일시정지
+      pauseSong();
+      
+      // 곡 로드
+      currentIndex = index;
+      loadSong(index);
+      
+      // 재생 카드 표시
+      if (!isPlayerVisible) {
+        isPlayerVisible = true;
+        musicPlayerCard.classList.add('visible');
+      }
+      
+      console.log('[History] 재생 버튼 클릭');
+      
+      // 자동 재생
+      setTimeout(() => {
+        if (isAutoPlayEnabled()) {
+          console.log('[History] 자동 재생 시작');
+          playSong();
+        } else {
+          console.log('[History] 자동 재생 비활성화 - 수동 재생 필요');
+        }
+      }, 100);
+    }
+  });
 
   // 재생/일시정지 버튼
   if (playBtnMain) {
@@ -376,19 +394,22 @@ function formatTime(seconds) {
     closePlayerBtn.addEventListener('click', () => {
       isPlayerVisible = false;
       musicPlayerCard.classList.remove('visible');
+      pauseSong();
     });
   }
 
   // 재생 카드 여닫기 버튼
-  togglePlayerBtn.addEventListener("click", () => {
-    isPlayerVisible = !isPlayerVisible;
+  if (togglePlayerBtn) {
+    togglePlayerBtn.addEventListener("click", () => {
+      isPlayerVisible = !isPlayerVisible;
 
-    if (isPlayerVisible) {
-      musicPlayerCard.classList.add("visible");  // 카드 보이기
-    } else {
-      musicPlayerCard.classList.remove("visible"); // 카드 숨기기
-    }
-  });
+      if (isPlayerVisible) {
+        musicPlayerCard.classList.add("visible");
+      } else {
+        musicPlayerCard.classList.remove("visible");
+      }
+    });
+  }
 
   // 년도 변경 이벤트
   yearSelect.addEventListener('change', (e) => {
