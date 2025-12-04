@@ -1,5 +1,8 @@
 const express = require('express');
 const dbConnect=require('./config/dbConnect');
+const methodOverride = require("method-override");
+const cookieParser = require("cookie-parser");
+require("dotenv").config();
 
 const path = require('path');
 const app = express();
@@ -11,12 +14,22 @@ dbConnect();
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
+// 쿠키 파서
+app.use(cookieParser());
+
 // 정적 파일 제공
 app.use(express.static(path.join(__dirname, 'public')));
+
+//method-override 미들웨어 등록(PUT, DELETE 처리) 
+app.use(methodOverride("_method"));
 
 // 뷰 엔진 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+
+//라우터 처리 미들웨어 등록
+app.use("/", require("./routes/loginRoutes"));
+// app.use("/", require("./routes/mainRoutes"));
 
 // 메인 페이지
 app.get('/index', (req, res) => {
@@ -78,6 +91,10 @@ app.get('/settings', (req, res) => {
 // q&A
 app.get('/qna', (req, res) => {
   res.render('src/qna');
+});
+
+app.use((req, res) => {
+  res.status(404).send('페이지를 찾을 수 없습니다.');
 });
 
 // 서버 시작

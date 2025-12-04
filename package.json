@@ -17,9 +17,16 @@
   },
   "homepage": "https://github.com/eunchae0215/Moodify#readme",
   "dependencies": {
+    "bcrypt": "^6.0.0",
+    "connect-mongo": "^6.0.0",
+    "cookie-parser": "^1.4.7",
     "dotenv": "^17.2.3",
     "ejs": "^3.1.10",
     "express": "^5.1.0",
+    "express-async-handler": "^1.2.0",
+    "express-session": "^1.18.2",
+    "jsonwebtoken": "^9.0.2",
+    "method-override": "^3.0.0",
     "mongoose": "^9.0.0"
   }
 }

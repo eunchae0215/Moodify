@@ -529,6 +529,38 @@ p {
   transform: translateY(0);
 }
 
+/* 에러 메시지 스타일 */
+.error-message {
+  display: none;  
+  background-color: #fee;
+  color: #c33;
+  padding: 10px;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  border: 1px solid #fcc;
+}
+
+/* 중복 확인 결과 메시지 */
+.check-result {
+  display: none; 
+  padding: 0px 5px;    
+  margin-bottom: 3px; 
+  font-size: 15px; 
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.check-result.success {
+  display: block;
+  color: #2fca53;
+}
+
+.check-result.error {
+  display: block;
+  color: #dc3545;
+}
+
 /* 회원가입 반응형 */
 @media (max-width: 768px) {
   .signup-container-center {

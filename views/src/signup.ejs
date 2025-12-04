@@ -16,13 +16,15 @@
 
     <!-- 회원가입 폼 박스 -->
     <div class="signup-main">
+      <div id="errorMessage" class="error-message" style="display: none;"></div>
       <form class="signup-form" id="signupForm">
         <!-- 닉네임 -->
         <input 
           type="text" 
           class="signup-input" 
           placeholder="닉네임" 
-          name="nickname"
+          name="username"
+          id="username"
           required
         />
         
@@ -32,14 +34,15 @@
             type="text" 
             class="signup-input-inline" 
             placeholder="아이디" 
-            name="username"
-            id="username"
+            name="userID"
+            id="userID"
             required
           />
           <button type="button" class="check-button" id="checkDuplicate">
             중복 확인
           </button>
         </div>
+        <span id="duplicateResult" class="check-result"></span>
 
         <!-- 비밀번호 -->
         <input 
@@ -56,8 +59,8 @@
           type="password" 
           class="signup-input" 
           placeholder="비밀번호 확인" 
-          name="passwordConfirm"
-          id="passwordConfirm"
+          name="password2"
+          id="password2"
           required
         />
 

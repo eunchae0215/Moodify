@@ -28,12 +28,12 @@
         </div>
       </div>
       <!-- 로그인 폼 -->
-      <form class="login-form" id="loginForm">
+      <form class="login-form" id="loginForm" action="/login" method="POST">
         <input 
           type="text" 
           class="login-input" 
           placeholder="아이디" 
-          name="nickname"
+          name="userID"
           required
         />
         <input 
@@ -46,8 +46,6 @@
         <button type="submit" class="login-button">
           로그인
         </button>
-
-        
 
         <a href="signup" class="register-link">회원가입</a>
       </form>
