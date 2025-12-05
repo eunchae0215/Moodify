@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/eunchae0215/Moodify#readme",
   "dependencies": {
+    "axios": "^1.13.2",
     "bcrypt": "^6.0.0",
     "connect-mongo": "^6.0.0",
     "cookie-parser": "^1.4.7",

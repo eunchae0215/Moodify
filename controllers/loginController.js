@@ -26,7 +26,7 @@ const loginUser=asyncHandler(async(req,res)=>{
         username: user.username,
     }, jwtSecret);
     res.cookie("token",token,{httpOnly:true});
-    res.status(200).json({redirectUrl:"/music"});
+    res.status(200).json({redirectUrl:"/index"});
 });
 
 //@route GET /register
