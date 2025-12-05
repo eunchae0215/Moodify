@@ -12,11 +12,16 @@ const checkLogin = async (req, res, next) => {
 
   try {
     const decoded = jwt.verify(token, jwtSecret);
-    req.username = decoded.username;
-    req.userID = decoded.userID;
+    req.user = {
+    id: decoded.id,  
+    userID: decoded.userID,
+    username: decoded.username
+};
     next();
   } catch (error) {
-    return res.status(401).json({ message: "로그인이 필요합니다." });
+    console.error('토큰 검증 실패:', error.message);
+    res.clearCookie("token");
+    return res.redirect("/login");
   }
 };
 

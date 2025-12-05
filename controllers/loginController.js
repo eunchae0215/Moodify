@@ -21,6 +21,7 @@ const loginUser=asyncHandler(async(req,res)=>{
         return res.status(401).json({message:"비밀번호가 일치하지 않습니다"});
     }
     const token=jwt.sign({
+        id: user._id,  
         userID: user.userID,
         username: user.username,
     }, jwtSecret);
@@ -45,8 +46,6 @@ const registerUser = asyncHandler(async (req, res) => {
 
     // 성공 메시지를 출력합니다.
     res.status(201).json({ message: "Register successful", user });
-    
-    // 로그인 페이지로 리다이렉트
     res.status(201).redirect("/");
 
   } else {
@@ -67,8 +66,8 @@ const checkUserID = asyncHandler(async (req, res) => {
 });
 
 const logout=(req,res)=>{
-  res.clearCookie("token");
-  res.status(201).json({redirectUrl:"/login"});
+  res.clearCookie("token",{httpOnly:true});
+  res.redirect("/login");
 };
 
 module.exports = {getRegister, registerUser, getlogin, loginUser, checkUserID, logout};

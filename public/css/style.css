@@ -532,12 +532,13 @@ p {
 /* 에러 메시지 스타일 */
 .error-message {
   display: none;  
-  background-color: #fee;
   color: #c33;
-  padding: 10px;
-  border-radius: 5px;
-  margin-bottom: 15px;
-  border: 1px solid #fcc;
+  padding: 0px 5px;    
+  margin-bottom: 3px; 
+  font-size: 15px; 
+  border-radius: 4px;
+  font-weight: 500;
+  transition: all 0.3s ease;
 }
 
 /* 중복 확인 결과 메시지 */

@@ -3,14 +3,12 @@ const userSchema = new mongoose.Schema({
   username: {
     type: String,
     required: true,
-    unique: true,
-    minlength: 3,
-    maxlength: 20,
     trim: true
   },
   userID:{
     type: String,
-    required: true
+    required: true,
+    unique: true
   },
   password: {
     type: String,
@@ -21,5 +19,4 @@ const userSchema = new mongoose.Schema({
   collection: 'users'
 });
 
-userSchema.index({ nickname: 1 }, { unique: true });
 module.exports = mongoose.model('User', userSchema);
