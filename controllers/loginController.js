@@ -37,20 +37,14 @@ const getRegister = (req, res)=>{
 //@route POST /register
 const registerUser = asyncHandler(async (req, res) => {
   const { username, userID, password, password2 } = req.body;
-  if (password === password2) {
-    // bcrypt를 사용해서 비밀번호를 암호화합니다.
-    const hashedPassword = await bcrypt.hash(password, 10);
-
-    // 사용자 이름, 아이디와 암호화된 비밀번호를 사용해서 새 사용자를 만듭니다.
-    const user = await User.create({ username, userID, password: hashedPassword });
-
-    // 성공 메시지를 출력합니다.
-    res.status(201).json({ message: "Register successful", user });
-    res.status(201).redirect("/");
-
-  } else {
-    res.send("Register Failed");
+  if (password !== password2) {
+    return res.send("Register Failed");
   }
+
+  const hashedPassword = await bcrypt.hash(password, 10);
+  await User.create({ username, userID, password: hashedPassword });
+
+  res.redirect("/");
 });
 
 const checkUserID = asyncHandler(async (req, res) => {
