@@ -2,7 +2,7 @@ const jwt=require("jsonwebtoken");
 require("dotenv").config();
 const jwtSecret=process.env.JWT_SECRET;
 
-const checkLogin = async (req, res, next) => {
+const checkLogin = (req, res, next) => {
   res.setHeader("Cache-Control", "no-cache, no-store, must-revalidate");
 
   const token = req.cookies.token;

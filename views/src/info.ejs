@@ -21,8 +21,10 @@
             type="text" 
             class="info-input" 
             id="nickname"
+            name="username"
             placeholder="닉네임"
-            value="닉네임"
+            value="<%= username %>"
+            required
           >
         </div>
 
@@ -33,7 +35,7 @@
             class="info-input readonly" 
             id="userId"
             placeholder="아이디"
-            value="아이디"
+            value="<%= userID %>"
             readonly
           >
         </div>
@@ -64,23 +66,6 @@
     </div>
   </div>
 
-  <script>
-    // 폼 제출 처리
-    document.getElementById('infoForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const password = document.getElementById('password').value;
-      const passwordConfirm = document.getElementById('passwordConfirm').value;
-      
-      // 비밀번호 확인
-      if (password && password !== passwordConfirm) {
-        alert('비밀번호가 일치하지 않습니다.');
-        return;
-      }
-      
-      // 여기에 서버로 전송하는 코드 추가
-      alert('정보가 수정되었습니다.');
-    });
-  </script>
+  <script src="/js/info.js"></script>
 </body>
 </html>

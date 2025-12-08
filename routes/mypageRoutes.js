@@ -5,6 +5,7 @@ const { requireAuth } = require("../middlewares/authMiddleware");
 const {
     getMypage,
     getInfo,
+    updateInfo,  // 추가
     getHistory,
     getFavorites,
     getSettings,
@@ -17,7 +18,9 @@ const {
 router.route("/mypage").get(checkLogin, getMypage);
 
 // 내 정보 수정
-router.route("/info").get(checkLogin, getInfo);
+router.route("/info")
+    .get(checkLogin, getInfo)
+    .put(requireAuth, updateInfo);
 
 // 히스토리
 router.route("/history").get(checkLogin, getHistory);

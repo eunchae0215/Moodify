@@ -1,6 +1,8 @@
 const asyncHandler = require("express-async-handler");
 const Emotion = require("../models/Emotion");
 const MusicHistory = require("../models/MusicHistory");
+const User = require("../models/User");
+const bcrypt = require("bcrypt");
 
 //@desc Get mypage
 //@route GET /mypage
@@ -14,9 +16,82 @@ const getMypage = asyncHandler(async (req, res) => {
 //@desc Get info page
 //@route GET /info
 const getInfo = asyncHandler(async (req, res) => {
+    // 디버깅 로그
+    console.log('=== /info 페이지 접근 ===');
+    console.log('req.user:', req.user);
+    console.log('username:', req.user?.username);
+    console.log('userID:', req.user?.userID);
+    
+    // 안전장치
+    if (!req.user) {
+        console.error('❌ req.user가 없습니다!');
+        return res.redirect('/login');
+    }
+    
+    console.log(`✅ 렌더링 데이터: username=${req.user.username}, userID=${req.user.userID}`);
+    
     res.render("src/info", {
         username: req.user.username,
         userID: req.user.userID
+    });
+});
+
+//@desc Update user info
+//@route PUT /info
+const updateInfo = asyncHandler(async (req, res) => {
+    const { username, password, password2 } = req.body;
+    const userId = req.user.id;
+
+    // 비밀번호 확인 (비밀번호 변경하는 경우에만)
+    if (password) {
+        if (password !== password2) {
+            return res.status(400).json({
+                success: false,
+                message: "비밀번호가 일치하지 않습니다."
+            });
+        }
+    }
+
+    // 닉네임 유효성 검증
+    if (!username || username.trim().length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: "닉네임을 입력해주세요."
+        });
+    }
+
+    // 업데이트할 데이터 준비
+    const updateData = {
+        username: username.trim()
+    };
+
+    // 비밀번호가 입력된 경우에만 해싱 후 추가
+    if (password) {
+        const hashedPassword = await bcrypt.hash(password, 10);
+        updateData.password = hashedPassword;
+    }
+
+    // DB 업데이트
+    const updatedUser = await User.findByIdAndUpdate(
+        userId,
+        updateData,
+        { new: true, runValidators: true }
+    ).select("-password");
+
+    if (!updatedUser) {
+        return res.status(404).json({
+            success: false,
+            message: "사용자를 찾을 수 없습니다."
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        message: "정보가 수정되었습니다.",
+        data: {
+            username: updatedUser.username,
+            userID: updatedUser.userID
+        }
     });
 });
 
@@ -124,6 +199,7 @@ const getMusicHistory = asyncHandler(async (req, res) => {
 module.exports = {
     getMypage,
     getInfo,
+    updateInfo,
     getHistory,
     getFavorites,
     getSettings,
