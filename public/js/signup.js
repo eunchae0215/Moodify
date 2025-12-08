@@ -67,35 +67,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ===== 회원가입 폼 제출 =====
   if (signupForm) {
-    signupForm.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      // 에러 표시 함수
-      function showError(message) {
-        if (errorDiv) {
-          errorDiv.textContent = message;
-          errorDiv.style.display = 'block';
-        } else {
-          alert(message);
-        }
-      }
-
-      function hideError() {
-        if (errorDiv) {
-          errorDiv.textContent = '';
-          errorDiv.style.display = 'none';
-        }
-      }
-      
+    signupForm.addEventListener('submit', (e) => {
       // 중복 확인 여부 체크
       if (!isUserIDChecked) {
+        e.preventDefault();
         showError('아이디 중복 확인을 해주세요.');
-        return;
+        return false;
       }
 
       if (!isUserIDAvailable) {
+        e.preventDefault();
         showError('사용할 수 없는 아이디입니다.');
-        return;
+        return false;
       }
 
       // 비밀번호 확인
@@ -103,42 +86,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const password2 = document.getElementById('password2').value;
 
       if (password !== password2) {
+        e.preventDefault();
         showError('비밀번호가 일치하지 않습니다.');
         return;
       }
 
       hideError();
-
-      // 폼 데이터 수집
-      const formData = new FormData(e.target);
-      const data = {
-        username: formData.get('username'), 
-        userID: formData.get('userID'),
-        password: formData.get('password'),
-        password2: formData.get('password2')
-      };
-
-      try {
-        const response = await fetch('/signup', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify(data)
-        });
-
-        const result = await response.json();
-
-        if (response.ok) {
-          alert('회원가입이 완료되었습니다!');
-          window.location.href = '/login';
-        } else {
-          showError(result.message || '회원가입에 실패했습니다.');
-        }
-      } catch (error) {
-        console.error('회원가입 오류:', error);
-        showError('회원가입 중 오류가 발생했습니다.');
-      }
+      return true;
     });
   }
 });

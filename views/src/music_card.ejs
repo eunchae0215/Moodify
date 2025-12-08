@@ -23,13 +23,13 @@
       <div class="player-card-fixed">
         <div class="player-card">
           <!-- 앨범 아트 (배경) -->
-          <div class="album-art-bg">
+          <div class="album-art-bg" id="albumArtBg">
           </div>
 
           <!-- 노래 정보 -->
           <div class="song-info">
-            <h2 class="song-title" id="songTitle">노래 제목 1</h2>
-            <p class="song-artist" id="songArtist">가수명 1</p>
+            <h2 class="song-title" id="songTitle">음악을 불러오는 중...</h2>
+            <p class="song-artist" id="songArtist">잠시만 기다려주세요</p>
           </div>
 
           <!-- 재생 컨트롤 -->
@@ -67,48 +67,7 @@
       <!-- 전면: 3D Carousel 썸네일 -->
       <div class="carousel-container">
         <div class="carousel-track" id="carouselTrack">
-          <!-- 썸네일 1 -->
-          <div class="carousel-item" data-index="0">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
-          <!-- 썸네일 2 -->
-          <div class="carousel-item" data-index="1">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
-          <!-- 썸네일 3 -->
-          <div class="carousel-item" data-index="2">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
-          <!-- 썸네일 4 -->
-          <div class="carousel-item" data-index="3">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
-          <!-- 썸네일 5 -->
-          <div class="carousel-item" data-index="4">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
-          <!-- 썸네일 6 -->
-          <div class="carousel-item" data-index="5">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
-          <!-- 썸네일 7 -->
-          <div class="carousel-item" data-index="6">
-            <div class="thumbnail-box">
-              <i class="fas fa-music"></i>
-            </div>
-          </div>
+          <!-- JavaScript로 동적 생성됨 -->
         </div>
       </div>
 
@@ -120,132 +79,7 @@
         </button>
         
         <div class="list-scroll-overlay">
-          <!-- 음악 아이템들 -->
-          <div class="music-item-overlay" data-index="0">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">행복한 노래 1</h3>
-              <p class="music-artist-overlay">아티스트 A</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="0">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="0">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="music-item-overlay" data-index="1">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">사랑 노래 2</h3>
-              <p class="music-artist-overlay">아티스트 B</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="1">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="1">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="music-item-overlay" data-index="2">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">슬픈 노래 3</h3>
-              <p class="music-artist-overlay">아티스트 C</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="2">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="2">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="music-item-overlay" data-index="3">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">화난 노래 4</h3>
-              <p class="music-artist-overlay">아티스트 D</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="3">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="3">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="music-item-overlay" data-index="4">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">신나는 노래 5</h3>
-              <p class="music-artist-overlay">아티스트 E</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="4">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="4">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="music-item-overlay" data-index="5">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">우울한 노래 6</h3>
-              <p class="music-artist-overlay">아티스트 F</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="5">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="5">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
-
-          <div class="music-item-overlay" data-index="6">
-            <div class="music-thumbnail-overlay">
-              <i class="fas fa-music"></i>
-            </div>
-            <div class="music-details-overlay">
-              <h3 class="music-title-overlay">평온한 노래 7</h3>
-              <p class="music-artist-overlay">아티스트 G</p>
-            </div>
-            <div class="music-actions-overlay">
-              <button class="play-item-btn-overlay" data-index="6">
-                <i class="fas fa-play"></i>
-              </button>
-              <button class="add-item-btn-overlay" data-index="6">
-                <i class="fas fa-plus-circle"></i>
-              </button>
-            </div>
-          </div>
+          <!-- JavaScript로 동적 생성됨 -->
         </div>
       </div>
 

@@ -37,14 +37,20 @@ const getRegister = (req, res)=>{
 //@route POST /register
 const registerUser = asyncHandler(async (req, res) => {
   const { username, userID, password, password2 } = req.body;
+
   if (password !== password2) {
-    return res.send("Register Failed");
+    return res.status(400).send("Register Failed");
+  }
+
+  const existingUser = await User.findOne({ userID });
+  if (existingUser) {
+    return res.status(400).send("이미 사용 중인 아이디입니다.");
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
   await User.create({ username, userID, password: hashedPassword });
 
-  res.redirect("/");
+  res.redirect("/login");
 });
 
 const checkUserID = asyncHandler(async (req, res) => {

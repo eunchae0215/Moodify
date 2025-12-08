@@ -68,7 +68,7 @@ const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
   try {
     console.log(`[YouTube API] 검색 시작: "${keyword}", 최대 ${maxResults}개`);
     
-    // 1단계: 검색 API 호출 (더 많은 결과 요청)
+    // 🔥 1단계: 검색 API 호출 (videoDuration: 'short' 추가)
     const searchResponse = await axios.get(`${YOUTUBE_API_BASE_URL}/search`, {
       params: {
         key: YOUTUBE_API_KEY,
@@ -76,6 +76,9 @@ const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
         q: keyword,
         type: 'video',
         videoCategoryId: '10', // 10 = Music 카테고리
+        videoDuration: 'medium', // 🆕 추가: 0~4분 영상만
+        videoEmbeddable: 'true', // 🆕 추가: 임베드 가능한 영상만
+        videoSyndicated: 'true', // 🆕 추가: 외부 재생 가능한 영상만
         maxResults: Math.min(maxResults * 2, 50), // 필터링 고려해 2배 요청 (최대 50)
         order: 'relevance',
         safeSearch: 'none',
@@ -161,8 +164,8 @@ const searchMultipleKeywords = async (keywords, resultsPerKeyword = 10, maxDurat
         const results = await searchMusic(keyword, resultsPerKeyword, maxDuration);
         allResults.push(...results);
         
-        // API 할당량 절약을 위한 딜레이 (100ms)
-        await new Promise(resolve => setTimeout(resolve, 100));
+        // API 할당량 절약을 위한 딜레이 (200ms)
+        await new Promise(resolve => setTimeout(resolve, 200));
       } catch (error) {
         console.error(`[YouTube API] "${keyword}" 검색 실패:`, error.message);
         // 한 키워드 실패해도 계속 진행
@@ -272,9 +275,9 @@ const previewSearch = async (keyword, count = 5) => {
 module.exports = {
   searchMusic,
   searchMultipleKeywords,
-  loadMoreMusic,           // 🆕 추가
+  loadMoreMusic,
   validateApiKey,
   parseDuration,
   formatDuration,
-  previewSearch            // 🆕 추가
+  previewSearch
 };
