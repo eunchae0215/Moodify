@@ -1,15 +1,3 @@
-/**
- * music_card.js - YouTube IFrame API 연동 버전
- * - URL에서 emotion, emotionId 추출
- * - 음악 추천 API 호출
- * - YouTube IFrame API로 재생
- * - 무한 재생 (추가 로딩)
- */
-
-// ============================================
-// 전역 변수
-// ============================================
-
 // URL 파라미터
 let currentEmotion = null;
 let currentEmotionId = null;
@@ -43,41 +31,79 @@ const totalTimeEl = document.getElementById('totalTime');
 let isListVisible = false;
 let progressInterval = null;
 
-// ============================================
-// 초기화
-// ============================================
+// localStorage에서 음악 리스트 가져오기
+function getMusicListFromCache(emotionId) {
+  try {
+    const key = `musicList_${emotionId}`;
+    const cached = localStorage.getItem(key);
+    if (cached) {
+      const data = JSON.parse(cached);
+      console.log(`[Cache] 캐시된 음악 리스트 발견: ${data.songs.length}개`);
+      return data;
+    }
+  } catch (error) {
+    console.error('[Cache] 캐시 읽기 오류:', error);
+  }
+  return null;
+}
 
+// localStorage에 음악 리스트 저장
+function saveMusicListToCache(emotionId, songsData, currentIdx = 0) {
+  try {
+    const key = `musicList_${emotionId}`;
+    const data = {
+      songs: songsData,
+      currentIndex: currentIdx,
+      timestamp: new Date().getTime()
+    };
+    localStorage.setItem(key, JSON.stringify(data));
+    console.log(`[Cache] 음악 리스트 저장 완료: ${songsData.length}개`);
+  } catch (error) {
+    console.error('[Cache] 캐시 저장 오류:', error);
+  }
+}
+
+// localStorage에서 현재 재생 위치 업데이트
+function updateCurrentIndexInCache(emotionId, idx) {
+  try {
+    const cached = getMusicListFromCache(emotionId);
+    if (cached) {
+      saveMusicListToCache(emotionId, cached.songs, idx);
+    }
+  } catch (error) {
+    console.error('[Cache] 재생 위치 업데이트 오류:', error);
+  }
+}
+
+// 초기화
 async function init() {
   console.log('[Music Card] 초기화 시작');
-  
+
   // 1. URL 파라미터 추출
   const urlParams = new URLSearchParams(window.location.search);
   currentEmotion = urlParams.get('emotion');
   currentEmotionId = urlParams.get('emotionId');
-  
+
   console.log('[Music Card] Emotion:', currentEmotion);
   console.log('[Music Card] EmotionId:', currentEmotionId);
-  
+
   if (!currentEmotion || !currentEmotionId) {
     alert('잘못된 접근입니다.');
     window.location.href = '/index';
     return;
   }
-  
+
   // 2. UI 이벤트 설정
   setupUIEvents();
-  
+
   // 3. YouTube API 로드
   loadYouTubeAPI();
-  
-  // 4. 음악 추천 API 호출
+
+  // 4. 음악 리스트 로드 (캐시 우선)
   await loadInitialMusic();
 }
 
-// ============================================
 // YouTube IFrame API 로드
-// ============================================
-
 function loadYouTubeAPI() {
   console.log('[YouTube] API 로드 시작');
   
@@ -161,13 +187,34 @@ function onPlayerStateChange(event) {
   }
 }
 
-// ============================================
 // 음악 추천 API
-// ============================================
-
 async function loadInitialMusic() {
   console.log('[API] 초기 음악 로딩 시작');
-  
+
+  // 1. 캐시 확인
+  const cached = getMusicListFromCache(currentEmotionId);
+
+  if (cached && cached.songs && cached.songs.length > 0) {
+    // 캐시된 데이터 사용
+    console.log(`[Cache] 캐시 사용 - ${cached.songs.length}개 음악, 재생 위치: ${cached.currentIndex}`);
+    songs = cached.songs;
+    currentIndex = cached.currentIndex || 0;
+
+    // UI 업데이트
+    updateCarousel();
+    updateMusicList();
+
+    // 저장된 위치부터 재생 (Player 준비되었으면)
+    if (isPlayerReady) {
+      loadSong(currentIndex);
+    }
+
+    return; // API 호출 안 함!
+  }
+
+  // 2. 캐시 없으면 API 호출
+  console.log('[Cache] 캐시 없음 - API 호출');
+
   try {
     const response = await fetch('/api/music/recommend', {
       method: 'POST',
@@ -177,15 +224,15 @@ async function loadInitialMusic() {
         count: 50
       })
     });
-    
+
     const data = await response.json();
-    
+
     if (!response.ok) {
       throw new Error(data.message || '음악 추천 실패');
     }
-    
+
     console.log(`[API] 음악 로딩 완료: ${data.data.totalCount}개`);
-    
+
     // songs 배열 구성
     songs = data.data.musicList.map(music => ({
       videoId: music.videoId,
@@ -194,26 +241,26 @@ async function loadInitialMusic() {
       thumbnailUrl: music.thumbnailUrl,
       duration: music.duration
     }));
-    
+
+    // localStorage에 저장
+    saveMusicListToCache(currentEmotionId, songs, 0);
+
     // UI 업데이트
     updateCarousel();
     updateMusicList();
-    
+
     // 첫 곡 로드 (Player 준비되었으면)
     if (isPlayerReady) {
       loadSong(0);
     }
-    
+
   } catch (error) {
     console.error('[API] 음악 로딩 실패:', error);
     alert('음악을 불러오는데 실패했습니다.');
   }
 }
 
-// ============================================
 // 무한 재생 - 추가 로딩
-// ============================================
-
 async function loadMoreMusic() {
   if (isLoadingMore) return;
   
@@ -252,11 +299,14 @@ async function loadMoreMusic() {
     
     // songs 배열에 추가
     songs.push(...newSongs);
-    
+
+    // localStorage 업데이트
+    saveMusicListToCache(currentEmotionId, songs, currentIndex);
+
     // UI 업데이트
     appendToCarousel(newSongs);
     appendToMusicList(newSongs);
-    
+
     console.log(`[API] 총 곡 수: ${songs.length}개`);
     
   } catch (error) {
@@ -266,10 +316,7 @@ async function loadMoreMusic() {
   }
 }
 
-// ============================================
 // 곡 로드 & 재생
-// ============================================
-
 function loadSong(index) {
   if (index < 0 || index >= songs.length) return;
 
@@ -277,6 +324,9 @@ function loadSong(index) {
 
   currentIndex = index;
   const song = songs[index];
+
+  // localStorage에 재생 위치 업데이트
+  updateCurrentIndexInCache(currentEmotionId, index);
 
   // UI 업데이트
   songTitle.textContent = song.title;
@@ -330,10 +380,7 @@ function onSongEnded() {
   }
 }
 
-// ============================================
 // 진행률 추적
-// ============================================
-
 function startProgressTracking() {
   stopProgressTracking();
   
@@ -364,10 +411,7 @@ function stopProgressTracking() {
   }
 }
 
-// ============================================
 // UI 업데이트
-// ============================================
-
 function updateCarousel() {
   console.log('[UI] Carousel 업데이트');
   
@@ -547,10 +591,7 @@ function updateListHighlight(index) {
   });
 }
 
-// ============================================
 // 음악 저장 API
-// ============================================
-
 async function saveMusicToHistory(song) {
   console.log('[API] 음악 저장:', song.title);
   
@@ -580,10 +621,7 @@ async function saveMusicToHistory(song) {
   }
 }
 
-// ============================================
 // Carousel 스크롤
-// ============================================
-
 function setupCarousel() {
   const items = document.querySelectorAll('.carousel-item');
   
@@ -677,10 +715,7 @@ function update3DEffect() {
   });
 }
 
-// ============================================
 // UI 이벤트
-// ============================================
-
 function setupUIEvents() {
   // 햄버거 메뉴
   hamburgerMenu.addEventListener('click', () => {
@@ -743,10 +778,7 @@ function setupUIEvents() {
   });
 }
 
-// ============================================
 // DB 저장
-// ============================================
-
 async function saveMusicToDB(song) {
   try {
     console.log(`[DB] 음악 저장 시도: ${song.title}`);
@@ -776,19 +808,12 @@ async function saveMusicToDB(song) {
   }
 }
 
-// ============================================
 // 유틸리티
-// ============================================
-
 function formatTime(seconds) {
   if (isNaN(seconds)) return '0:00';
   const mins = Math.floor(seconds / 60);
   const secs = Math.floor(seconds % 60);
   return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
 }
-
-// ============================================
-// 초기화 실행
-// ============================================
 
 init();

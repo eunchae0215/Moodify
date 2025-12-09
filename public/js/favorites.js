@@ -1,4 +1,3 @@
-// HTML이 완전히 로드된 후 실행
 document.addEventListener('DOMContentLoaded', function() {
   // 모든 폴더 버튼 선택
   const folderBtns = document.querySelectorAll('.folder-btn');
@@ -18,7 +17,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
   });
 
-  // 폴더 전체 클릭 이벤트 (호버 효과)
+  // 폴더 전체 클릭 이벤트
   moodFolders.forEach((folder) => {
     folder.addEventListener('mouseenter', () => {
       folder.classList.add('hover');

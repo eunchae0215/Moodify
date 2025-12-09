@@ -140,8 +140,6 @@ const getEmotionHistory = asyncHandler(async (req, res) => {
   // 감정 히스토리 조회
   const emotions = await Emotion.find(query).sort({ timestamp: -1 }).limit(100);
 
-  console.log(`[Emotion] 히스토리 조회: ${emotions.length}개 (User: ${req.user.username})`);
-
   res.status(200).json({
     success: true,
     message: "감정 히스토리 조회 완료",
@@ -174,8 +172,6 @@ const getMusicHistory = asyncHandler(async (req, res) => {
     .sort({ playedAt: -1 })
     .limit(100)
     .populate("emotionId", "emotion emoji timestamp");
-
-  console.log(`[Music] 히스토리 조회: ${musicHistory.length}개 (User: ${req.user.username})`);
 
   res.status(200).json({
     success: true,

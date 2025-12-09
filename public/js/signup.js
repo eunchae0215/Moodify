@@ -1,7 +1,7 @@
 let isUserIDChecked = false;
 let isUserIDAvailable = false;
 
-// ===== DOM이 로드된 후 실행 =====
+// DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', () => {
   // DOM 요소들을 한 번에 선언 (모든 이벤트 리스너에서 사용 가능)
   const checkButton = document.getElementById('checkDuplicate');
@@ -10,7 +10,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const signupForm = document.getElementById('signupForm');
   const errorDiv = document.getElementById('errorMessage');
 
-  // ===== 중복 확인 버튼 클릭 이벤트 =====
+  // 중복 확인 버튼 클릭 이벤트
   if (checkButton) {
     checkButton.addEventListener('click', async () => {
       const userID = userIDInput.value.trim();
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ===== 아이디 입력 필드 변경 시 중복 확인 초기화 =====
+  // 아이디 입력 필드 변경 시 중복 확인 초기화 
   if (userIDInput) {
     userIDInput.addEventListener('input', () => {
       isUserIDChecked = false;
@@ -65,7 +65,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ===== 회원가입 폼 제출 =====
+  // 회원가입 폼 제출 
   if (signupForm) {
     signupForm.addEventListener('submit', (e) => {
       // 중복 확인 여부 체크

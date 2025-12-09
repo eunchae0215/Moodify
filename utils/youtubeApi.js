@@ -68,7 +68,7 @@ const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
   try {
     console.log(`[YouTube API] 검색 시작: "${keyword}", 최대 ${maxResults}개`);
     
-    // 🔥 1단계: 검색 API 호출 (videoDuration: 'short' 추가)
+    // 1단계: 검색 API 호출 (videoDuration: 'short' 추가)
     const searchResponse = await axios.get(`${YOUTUBE_API_BASE_URL}/search`, {
       params: {
         key: YOUTUBE_API_KEY,

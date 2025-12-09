@@ -5,7 +5,7 @@ document.getElementById('qnaForm').addEventListener('submit', async function(e) 
   const content = document.getElementById('qnaContent').value;
   const submitBtn = document.getElementById('qnaSubmitBtn');
 
-  // 버튼 비활성화 (중복 전송 방지)
+  // 버튼 비활성화
   submitBtn.disabled = true;
   submitBtn.textContent = '전송 중...';
 

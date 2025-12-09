@@ -2,9 +2,9 @@
 const emojiButtons = document.querySelectorAll('.emoji-button');
 const musicButton = document.getElementById('musicButton');
 let selectedMood = null;
-let selectedEmoji = null; // 🆕 추가
+let selectedEmoji = null; 
 
-// 🆕 감정-이모지 매핑
+// 감정-이모지 매핑
 const moodEmojiMap = {
   happy: '😊',
   love: '😍',
@@ -24,23 +24,23 @@ emojiButtons.forEach(button => {
     
     // 선택한 감정 저장
     selectedMood = button.dataset.mood;
-    selectedEmoji = moodEmojiMap[selectedMood]; // 🆕 추가
+    selectedEmoji = moodEmojiMap[selectedMood]; 
     
-    console.log(`[Index] 감정 선택: ${selectedMood} (${selectedEmoji})`); // 🆕 추가
+    console.log(`[Index] 감정 선택: ${selectedMood} (${selectedEmoji})`); 
     
     // 음악 버튼 활성화
     musicButton.classList.add('active');
   });
 });
 
-// 🆕 음악 들으러 가기 버튼 클릭 (완전 수정)
+// 🆕 음악 들으러 가기 버튼 클릭
 musicButton.addEventListener('click', async () => {
   if (!selectedMood) {
     alert('감정을 선택해주세요!');
     return;
   }
   
-  // 버튼 비활성화 (중복 클릭 방지)
+  // 버튼 비활성화
   const originalText = musicButton.textContent;
   musicButton.disabled = true;
   musicButton.textContent = '저장 중...';
@@ -49,7 +49,7 @@ musicButton.addEventListener('click', async () => {
   try {
     console.log('[Index] 감정 저장 API 호출 시작');
     
-    // 🔥 감정 저장 API 호출
+    // 감정 저장 API 호출
     const response = await fetch('/api/emotions', {
       method: 'POST',
       headers: {
@@ -73,7 +73,7 @@ musicButton.addEventListener('click', async () => {
     
     const emotionId = data.data.emotionId;
     
-    // 🔥 /music 페이지로 이동 (emotion + emotionId 전달)
+    // music 페이지로 이동
     window.location.href = `/music?emotion=${selectedMood}&emotionId=${emotionId}`;
     
   } catch (error) {

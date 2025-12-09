@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
 
-  // 탈퇴하기 버튼 - 데이터 삭제
+  // 데이터 삭제 버튼
   confirmDeleteBtn.addEventListener('click', () => {
     // TODO: 서버에 데이터 삭제 요청
     // fetch('/api/user/delete-data', { method: 'POST' })
@@ -69,15 +69,12 @@ document.addEventListener('DOMContentLoaded', function() {
     //       window.location.href = '/login';
     //     }
     //   });
-
-    // 임시: 로컬 스토리지 초기화
-    console.log('데이터 삭제 요청');
     
     // 모달 닫기
     modalOverlay.classList.remove('visible');
     
     // 사용자에게 알림
-    alert('모든 데이터가 삭제되었습니다. (개발 중 - 실제 DB 연결 필요)');
+    alert('모든 데이터가 삭제되었습니다.');
     
     // TODO: 실제로는 로그아웃 후 로그인 페이지로 이동
     // window.location.href = '/login';

@@ -51,13 +51,13 @@ document.addEventListener('DOMContentLoaded', function() {
     favoritesMusicTitle.textContent = moodTitles[mood] || '기쁨의 Moodify';
   }
 
-  // 음악 리스트 로드 (임시 데이터)
+  // 음악 리스트 로드 
   function loadMusicList() {
     const musicItems = document.querySelectorAll('.favorites-music-item');
     songs = Array.from(musicItems).map(item => ({
       title: item.querySelector('.favorites-music-item-title').textContent,
       artist: item.querySelector('.favorites-music-item-artist').textContent,
-      duration: 180 // 3분 (초 단위)
+      duration: 180 
     }));
   }
 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', function() {
     loadSong(0);
   }
 
-  // 재생 버튼 클릭 이벤트 (이벤트 위임)
+  // 재생 버튼 클릭 이벤트 
   document.body.addEventListener('click', (e) => {
     // 재생 버튼 클릭
     if (e.target.closest('.favorites-play-btn')) {

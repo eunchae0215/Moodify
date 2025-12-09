@@ -67,7 +67,7 @@ const getLatestEmotion = asyncHandler(async (req, res) => {
 // POST /api/emotions
 const saveEmotion = asyncHandler(async (req, res) => {
   const { emotion, emoji, memo } = req.body;
-  const userId = req.user.id; // authMiddleware에서 설정됨
+  const userId = req.user.id;
 
   // 필수 값 체크
   if (!emotion || !emoji) {
@@ -141,12 +141,12 @@ const recommendMusic = asyncHandler(async (req, res) => {
       emotion,
       keywords,
       totalCount: musicList.length,
-      musicList: musicList.slice(0, count), // 요청한 개수만큼만
+      musicList: musicList.slice(0, count), 
     },
   });
 });
 
-// 추가 음악 로딩 API (무한 재생용)
+// 추가 음악 로딩 API 
 // POST /api/music/load-more
 const loadMore = asyncHandler(async (req, res) => {
   const { emotion, excludeVideoIds = [], count = 30 } = req.body;
@@ -181,9 +181,8 @@ const loadMore = asyncHandler(async (req, res) => {
   });
 });
 
-// 음악 저장 API (재생목록에 추가)
+// 음악 저장 API 
 // POST /api/music/save
-
 const saveMusic = asyncHandler(async (req, res) => {
   const { emotionId, videoId, title, channelTitle, thumbnailUrl } = req.body;
   const userId = req.user.id;
@@ -226,8 +225,6 @@ const saveMusic = asyncHandler(async (req, res) => {
   });
 
   await newMusic.save();
-
-  console.log(`[Music] 음악 저장 완료: ${title} (User: ${req.user.username})`);
 
   res.status(201).json({
     success: true,

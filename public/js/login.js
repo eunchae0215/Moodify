@@ -1,4 +1,4 @@
-// ===== DOM 로드 후 실행 =====
+// DOM 로드 후 실행
 document.addEventListener('DOMContentLoaded', () => {
   // DOM 요소 선언
   const loginForm = document.getElementById('loginForm');

@@ -1,19 +1,9 @@
-/**
- * JWT 인증 미들웨어
- * - 쿠키에서 토큰 추출
- * - 토큰 검증
- * - req.user 설정
- */
-
 const jwt = require("jsonwebtoken");
 const asyncHandler = require("express-async-handler");
 
 const jwtSecret = process.env.JWT_SECRET;
 
-/**
- * 인증 필수 미들웨어 (API용)
- * 토큰이 없거나 유효하지 않으면 JSON 에러 응답
- */
+// 인증 필수 미들웨어
 const requireAuth = asyncHandler(async (req, res, next) => {
   // 1. 쿠키에서 토큰 추출
   const token = req.cookies.token;
@@ -29,7 +19,7 @@ const requireAuth = asyncHandler(async (req, res, next) => {
     // 2. 토큰 검증
     const decoded = jwt.verify(token, jwtSecret);
 
-    // 3. req에 사용자 정보 저장 (checkLogin과 동일한 형식)
+    // 3. req에 사용자 정보 저장 
     req.user = {
       id: decoded.id,
       userID: decoded.userID,
@@ -54,10 +44,7 @@ const requireAuth = asyncHandler(async (req, res, next) => {
   }
 });
 
-/**
- * 선택적 인증 미들웨어
- * 토큰이 있으면 검증하지만, 없어도 통과
- */
+// 선택적 인증 미들웨어
 const optionalAuth = (req, res, next) => {
   const token = req.cookies.token;
 

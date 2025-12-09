@@ -1,9 +1,3 @@
-/**
- * 내 정보 수정 페이지 스크립트
- * - 폼 유효성 검증
- * - 서버 통신 (PUT /info)
- */
-
 document.addEventListener('DOMContentLoaded', function() {
   const infoForm = document.getElementById('infoForm');
   
@@ -15,9 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
   infoForm.addEventListener('submit', handleFormSubmit);
 });
 
-/**
- * 폼 제출 핸들러
- */
+// 폼 제출 핸들러
 async function handleFormSubmit(e) {
   e.preventDefault();
   
@@ -44,9 +36,7 @@ async function handleFormSubmit(e) {
   await updateUserInfo(username, password, passwordConfirm);
 }
 
-/**
- * 서버로 사용자 정보 수정 요청
- */
+// 서버로 사용자 정보 수정 요청
 async function updateUserInfo(username, password, passwordConfirm) {
   try {
     const response = await fetch('/info', {
