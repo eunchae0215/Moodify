@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 const User = require('./User');
 const Emotion = require('./Emotion');
 const MusicHistory = require('./MusicHistory');
+const Question = require('./Question');
 
 const connectDB = async () => {
   try {
@@ -21,5 +22,6 @@ module.exports = {
   connectDB,
   User,
   Emotion,
-  MusicHistory
+  MusicHistory,
+  Question
 };

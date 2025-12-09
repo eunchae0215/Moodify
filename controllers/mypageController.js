@@ -2,6 +2,7 @@ const asyncHandler = require("express-async-handler");
 const Emotion = require("../models/Emotion");
 const MusicHistory = require("../models/MusicHistory");
 const User = require("../models/User");
+const Question = require("../models/Question");
 const bcrypt = require("bcrypt");
 
 //@desc Get mypage
@@ -196,6 +197,94 @@ const getMusicHistory = asyncHandler(async (req, res) => {
   });
 });
 
+//@desc Submit QnA
+//@route POST /qna
+const submitQna = asyncHandler(async (req, res) => {
+    const { content } = req.body;
+    const userId = req.user.id;
+    const username = req.user.username;
+    const userID = req.user.userID;
+
+    // 내용 유효성 검증
+    if (!content || content.trim().length === 0) {
+        return res.status(400).json({
+            success: false,
+            message: "문의 내용을 입력해주세요."
+        });
+    }
+
+    // Q&A 저장
+    const newQna = await Question.create({
+        userId,
+        username,
+        userID,
+        content: content.trim()
+    });
+
+    console.log(`[QnA] 새 문의 등록: ${username} (${userID})`);
+
+    res.status(201).json({
+        success: true,
+        message: "문의가 성공적으로 전송되었습니다!",
+        data: {
+            id: newQna._id,
+            content: newQna.content,
+            createdAt: newQna.createdAt
+        }
+    });
+});
+
+//@desc Delete user account
+//@route POST /withdraw
+const deleteAccount = asyncHandler(async (req, res) => {
+    const userId = req.user.id;
+    const username = req.user.username;
+    const userID = req.user.userID;
+
+    console.log(`[탈퇴 시작] 사용자: ${username} (${userID})`);
+
+    try {
+        // 1. 감정 기록 삭제
+        const emotionResult = await Emotion.deleteMany({ userId });
+        console.log(`  - 감정 기록 삭제: ${emotionResult.deletedCount}개`);
+
+        // 2. 음악 히스토리 삭제
+        const musicResult = await MusicHistory.deleteMany({ userId });
+        console.log(`  - 음악 히스토리 삭제: ${musicResult.deletedCount}개`);
+
+        // 3. Q&A 삭제
+        const qnaResult = await Question.deleteMany({ userId });
+        console.log(`  - Q&A 삭제: ${qnaResult.deletedCount}개`);
+
+        // 4. 사용자 계정 삭제 (마지막)
+        const deletedUser = await User.findByIdAndDelete(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "사용자를 찾을 수 없습니다."
+            });
+        }
+
+        console.log(`✅ [탈퇴 완료] 사용자: ${username} (${userID})`);
+
+        // 5. JWT 토큰 쿠키 삭제
+        res.clearCookie('token');
+
+        res.status(200).json({
+            success: true,
+            message: "회원 탈퇴가 완료되었습니다."
+        });
+
+    } catch (error) {
+        console.error("❌ [탈퇴 실패]", error);
+        res.status(500).json({
+            success: false,
+            message: "탈퇴 처리 중 오류가 발생했습니다."
+        });
+    }
+});
+
 module.exports = {
     getMypage,
     getInfo,
@@ -204,6 +293,8 @@ module.exports = {
     getFavorites,
     getSettings,
     getQna,
+    submitQna,
+    deleteAccount,
     getEmotionHistory,
     getMusicHistory,
 };

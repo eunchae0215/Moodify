@@ -5,13 +5,15 @@ const { requireAuth } = require("../middlewares/authMiddleware");
 const {
     getMypage,
     getInfo,
-    updateInfo,  // 추가
+    updateInfo,
     getHistory,
     getFavorites,
     getSettings,
     getQna,
+    submitQna,
+    deleteAccount,
     getEmotionHistory,
-    getMusicHistory     
+    getMusicHistory
 } = require('../controllers/mypageController');
 
 // 마이페이지
@@ -32,9 +34,17 @@ router.route("/favorites").get(checkLogin, getFavorites);
 router.route("/settings").get(checkLogin, getSettings);
 
 // Q&A
-router.route("/qna").get(checkLogin, getQna);
+router.route("/qna")
+    .get(checkLogin, getQna)
+    .post(requireAuth, submitQna);
 
 router.get("/api/emotions/history", requireAuth, getEmotionHistory);
 router.get("/api/music/history", requireAuth, getMusicHistory);
+
+// 회원 탈퇴
+router.post("/withdraw", requireAuth, deleteAccount);
+
+// 디버깅: 등록된 라우트 확인
+console.log('✅ mypageRoutes - /withdraw POST 라우트 등록됨');
 
 module.exports = router;
