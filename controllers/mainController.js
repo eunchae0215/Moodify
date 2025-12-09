@@ -33,6 +33,36 @@ const getMusicList = asyncHandler(async (req, res) => {
     });
 });
 
+// 최근 감정 조회 API
+// GET /api/emotions/latest
+const getLatestEmotion = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  // 가장 최근 감정 조회
+  const latestEmotion = await Emotion.findOne({ userId })
+    .sort({ timestamp: -1 })
+    .limit(1);
+
+  if (!latestEmotion) {
+    return res.status(404).json({
+      success: false,
+      message: "저장된 감정이 없습니다.",
+    });
+  }
+
+  console.log(`[Emotion] 최근 감정 조회: ${latestEmotion.emotion} (User: ${req.user.username})`);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      emotionId: latestEmotion._id,
+      emotion: latestEmotion.emotion,
+      emoji: latestEmotion.emoji,
+      timestamp: latestEmotion.timestamp,
+    },
+  });
+});
+
 // 감정 저장 API
 // POST /api/emotions
 const saveEmotion = asyncHandler(async (req, res) => {
@@ -212,6 +242,7 @@ module.exports = {
     getIndex,
     getMusic,
     getMusicList,
+    getLatestEmotion,
     saveEmotion,
     recommendMusic,
     loadMore,

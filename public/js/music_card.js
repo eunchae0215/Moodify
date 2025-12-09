@@ -272,12 +272,12 @@ async function loadMoreMusic() {
 
 function loadSong(index) {
   if (index < 0 || index >= songs.length) return;
-  
+
   console.log(`[Player] 곡 로드: ${index}`);
-  
+
   currentIndex = index;
   const song = songs[index];
-  
+
   // UI 업데이트
   songTitle.textContent = song.title;
   songArtist.textContent = song.artist;
@@ -286,16 +286,19 @@ function loadSong(index) {
   progressBar.max = song.duration;
   progressBar.value = 0;
   progressFill.style.width = '0%';
-  
+
   // YouTube Player에 영상 로드
   if (isPlayerReady && player) {
     player.loadVideoById(song.videoId);
   }
-  
+
   // Carousel & List 하이라이트
   updateCarouselHighlight(index);
   updateListHighlight(index);
   scrollToIndex(index);
+
+  // DB에 재생 기록 저장
+  saveMusicToDB(song);
 }
 
 function playSong() {
@@ -738,6 +741,39 @@ function setupUIEvents() {
       playBtn.click();
     }
   });
+}
+
+// ============================================
+// DB 저장
+// ============================================
+
+async function saveMusicToDB(song) {
+  try {
+    console.log(`[DB] 음악 저장 시도: ${song.title}`);
+
+    const response = await fetch('/api/music/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emotionId: currentEmotionId,
+        videoId: song.videoId,
+        title: song.title,
+        channelTitle: song.artist,
+        thumbnailUrl: song.thumbnailUrl
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(`[DB] 음악 저장 완료: ${song.title}`);
+    } else {
+      console.warn(`[DB] 음악 저장 실패: ${data.message}`);
+    }
+  } catch (error) {
+    console.error('[DB] 음악 저장 오류:', error);
+    // 저장 실패해도 재생은 계속됨 (사용자 경험 유지)
+  }
 }
 
 // ============================================

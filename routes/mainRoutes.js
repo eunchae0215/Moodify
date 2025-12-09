@@ -19,6 +19,7 @@ router.route("/music").get(checkLogin, getMusic);
 // 음악 리스트 페이지
 router.route("/musiclist").get(checkLogin, getMusicList);
 
+router.get("/api/emotions/latest", requireAuth, mainController.getLatestEmotion);
 router.post("/api/emotions", requireAuth, mainController.saveEmotion);
 router.post("/api/music/recommend", requireAuth, mainController.recommendMusic);
 router.post("/api/music/load-more", requireAuth, mainController.loadMore);

@@ -44,7 +44,4 @@ router.get("/api/music/history", requireAuth, getMusicHistory);
 // 회원 탈퇴
 router.post("/withdraw", requireAuth, deleteAccount);
 
-// 디버깅: 등록된 라우트 확인
-console.log('✅ mypageRoutes - /withdraw POST 라우트 등록됨');
-
 module.exports = router;

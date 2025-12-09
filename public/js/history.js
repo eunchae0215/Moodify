@@ -151,15 +151,104 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  // 해당 날짜의 음악 로드 (임시 데이터)
-  function loadMusicForDate(date) {
-    // 임시 데이터 - 나중에 서버에서 가져올 데이터
-    const musicItems = document.querySelectorAll('.history-music-item');
-    songs = Array.from(musicItems).map(item => ({
-      title: item.querySelector('.history-music-title').textContent,
-      artist: item.querySelector('.history-music-artist').textContent,
-      duration: 180 // 3분 (초 단위)
-    }));
+  // 해당 날짜의 음악 로드
+  async function loadMusicForDate(date) {
+    try {
+      // 선택한 날짜의 시작 시간과 종료 시간 계산
+      const startDate = new Date(date);
+      startDate.setHours(0, 0, 0, 0);
+
+      const endDate = new Date(date);
+      endDate.setHours(23, 59, 59, 999);
+
+      console.log(`[History] 음악 로드 시작: ${startDate.toISOString()} ~ ${endDate.toISOString()}`);
+
+      // 서버에서 음악 히스토리 가져오기
+      const response = await fetch('/api/music/history');
+
+      if (!response.ok) {
+        throw new Error('음악 히스토리 조회 실패');
+      }
+
+      const data = await response.json();
+      console.log(`[History] 전체 히스토리 개수: ${data.data.musicHistory.length}`);
+
+      // 선택한 날짜의 음악만 필터링
+      const filteredMusic = data.data.musicHistory.filter(music => {
+        const playedAt = new Date(music.playedAt);
+        return playedAt >= startDate && playedAt <= endDate;
+      });
+
+      console.log(`[History] 선택한 날짜의 음악 개수: ${filteredMusic.length}`);
+
+      // 감정 이모지 표시 (첫 번째 음악의 감정 사용)
+      if (filteredMusic.length > 0 && filteredMusic[0].emotionId) {
+        const emoji = filteredMusic[0].emotionId.emoji || '😊';
+        historyMoodEmoji.textContent = emoji;
+      } else {
+        historyMoodEmoji.textContent = '🎵';
+      }
+
+      // 음악 리스트 렌더링
+      renderMusicList(filteredMusic);
+
+      // songs 배열 업데이트 (플레이어용)
+      songs = filteredMusic.map(music => ({
+        title: music.videoTitle,
+        artist: music.channelTitle,
+        duration: 180, // 기본 3분 (실제로는 유튜브 API에서 가져와야 함)
+        videoId: music.youtubeVideoId,
+        thumbnailUrl: music.thumbnailUrl
+      }));
+
+    } catch (error) {
+      console.error('[History] 음악 로드 오류:', error);
+      alert('음악 히스토리를 불러오는 중 오류가 발생했습니다.');
+    }
+  }
+
+  // 음악 리스트 렌더링
+  function renderMusicList(musicList) {
+    const historyMusicList = document.getElementById('historyMusicList');
+
+    if (!historyMusicList) {
+      console.error('[History] 음악 리스트 컨테이너를 찾을 수 없습니다.');
+      return;
+    }
+
+    // 기존 리스트 초기화
+    historyMusicList.innerHTML = '';
+
+    if (musicList.length === 0) {
+      historyMusicList.innerHTML = '<p style="text-align: center; padding: 20px; color: #999;">이 날짜에 들은 음악이 없습니다.</p>';
+      return;
+    }
+
+    // 음악 아이템 생성
+    musicList.forEach((music, index) => {
+      const musicItem = document.createElement('div');
+      musicItem.className = 'history-music-item';
+
+      musicItem.innerHTML = `
+        <div class="history-music-thumbnail">
+          <img src="${music.thumbnailUrl}" alt="${music.videoTitle}" style="width: 100%; height: 100%; object-fit: cover; border-radius: 8px;">
+        </div>
+        <div class="history-music-details">
+          <h3 class="history-music-title">${music.videoTitle}</h3>
+          <p class="history-music-artist">${music.channelTitle}</p>
+        </div>
+        <div class="history-music-actions">
+          <button class="history-play-btn">
+            <i class="fas fa-play"></i>
+          </button>
+          <button class="history-add-btn">
+            <i class="fas fa-plus"></i>
+          </button>
+        </div>
+      `;
+
+      historyMusicList.appendChild(musicItem);
+    });
   }
 
   // 닫기 버튼 이벤트

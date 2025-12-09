@@ -17,19 +17,9 @@ const getMypage = asyncHandler(async (req, res) => {
 //@desc Get info page
 //@route GET /info
 const getInfo = asyncHandler(async (req, res) => {
-    // 디버깅 로그
-    console.log('=== /info 페이지 접근 ===');
-    console.log('req.user:', req.user);
-    console.log('username:', req.user?.username);
-    console.log('userID:', req.user?.userID);
-    
-    // 안전장치
     if (!req.user) {
-        console.error('❌ req.user가 없습니다!');
         return res.redirect('/login');
     }
-    
-    console.log(`✅ 렌더링 데이터: username=${req.user.username}, userID=${req.user.userID}`);
     
     res.render("src/info", {
         username: req.user.username,
@@ -266,8 +256,6 @@ const deleteAccount = asyncHandler(async (req, res) => {
             });
         }
 
-        console.log(`✅ [탈퇴 완료] 사용자: ${username} (${userID})`);
-
         // 5. JWT 토큰 쿠키 삭제
         res.clearCookie('token');
 
@@ -277,7 +265,6 @@ const deleteAccount = asyncHandler(async (req, res) => {
         });
 
     } catch (error) {
-        console.error("❌ [탈퇴 실패]", error);
         res.status(500).json({
             success: false,
             message: "탈퇴 처리 중 오류가 발생했습니다."
