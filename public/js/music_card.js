@@ -11,6 +11,7 @@ let songs = [];
 let currentIndex = 0;
 let isPlaying = false;
 let isLoadingMore = false;
+let savedVideoIds = new Set(); // 저장된 곡 ID 목록
 
 // UI 요소
 const hamburgerMenu = document.getElementById('hamburgerMenu');
@@ -101,6 +102,9 @@ async function init() {
 
   // 4. 음악 리스트 로드 (캐시 우선)
   await loadInitialMusic();
+
+  // 5. 저장된 곡 목록 가져오기
+  await loadSavedFavorites();
 }
 
 // YouTube IFrame API 로드
@@ -163,13 +167,7 @@ function onPlayerReady(event) {
 
 function onPlayerStateChange(event) {
   console.log('[YouTube] 상태 변경:', event.data);
-  
-  // 재생 종료
-  if (event.data === YT.PlayerState.ENDED) {
-    console.log('[YouTube] 곡 종료');
-    onSongEnded();
-  }
-  
+
   // 재생 중
   if (event.data === YT.PlayerState.PLAYING) {
     console.log('[YouTube] 재생 시작');
@@ -177,13 +175,19 @@ function onPlayerStateChange(event) {
     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
     startProgressTracking();
   }
-  
+
   // 일시정지
   if (event.data === YT.PlayerState.PAUSED) {
     console.log('[YouTube] 일시정지');
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
     stopProgressTracking();
+  }
+
+  // 재생 종료
+  if (event.data === YT.PlayerState.ENDED) {
+    console.log('[YouTube] 곡 종료');
+    onSongEnded();
   }
 }
 
@@ -263,14 +267,16 @@ async function loadInitialMusic() {
 // 무한 재생 - 추가 로딩
 async function loadMoreMusic() {
   if (isLoadingMore) return;
-  
+
   isLoadingMore = true;
   console.log('[API] 추가 음악 로딩 시작');
-  
+
   try {
-    // 이미 재생한 곡들의 videoId
+    let newSongs = [];
+
+    // 이미 재생한 곡 제외
     const excludeVideoIds = songs.map(s => s.videoId);
-    
+
     const response = await fetch('/api/music/load-more', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -280,23 +286,29 @@ async function loadMoreMusic() {
         count: 30
       })
     });
-    
-    const data = await response.json();
-    
-    if (!response.ok) {
-      throw new Error(data.message || '추가 로딩 실패');
+
+    if (response.ok) {
+      const data = await response.json();
+
+      if (data.success && data.data.musicList.length > 0) {
+        console.log(`[API] 추가 로딩 성공: ${data.data.musicList.length}개`);
+
+        newSongs = data.data.musicList.map(music => ({
+          videoId: music.videoId,
+          title: music.title,
+          artist: music.channelTitle || 'Unknown',
+          thumbnailUrl: music.thumbnailUrl || `https://i.ytimg.com/vi/${music.videoId}/default.jpg`,
+          duration: music.duration || 180
+        }));
+      } else {
+        console.log('[API] 추가 로딩 결과 없음');
+      }
+    } else {
+      console.error('[API] 추가 로딩 요청 실패');
     }
-    
-    console.log(`[API] 추가 로딩 완료: ${data.data.totalCount}개`);
-    
-    const newSongs = data.data.musicList.map(music => ({
-      videoId: music.videoId,
-      title: music.title,
-      artist: music.channelTitle,
-      thumbnailUrl: music.thumbnailUrl,
-      duration: music.duration
-    }));
-    
+
+    console.log(`[API] 추가 로딩 완료: ${newSongs.length}개`);
+
     // songs 배열에 추가
     songs.push(...newSongs);
 
@@ -308,12 +320,40 @@ async function loadMoreMusic() {
     appendToMusicList(newSongs);
 
     console.log(`[API] 총 곡 수: ${songs.length}개`);
-    
+
   } catch (error) {
     console.error('[API] 추가 로딩 실패:', error);
   } finally {
     isLoadingMore = false;
   }
+}
+
+// 🆕 알림 표시 함수
+function showNotification(message) {
+  // 간단한 알림 표시 (필요시 커스터마이징)
+  const notification = document.createElement('div');
+  notification.textContent = message;
+  notification.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    z-index: 10000;
+    font-size: 14px;
+    font-weight: 500;
+    animation: slideIn 0.3s ease-out;
+  `;
+
+  document.body.appendChild(notification);
+
+  setTimeout(() => {
+    notification.style.animation = 'slideOut 0.3s ease-out';
+    setTimeout(() => notification.remove(), 300);
+  }, 3000);
 }
 
 // 곡 로드 & 재생
@@ -336,6 +376,9 @@ function loadSong(index) {
   progressBar.max = song.duration;
   progressBar.value = 0;
   progressFill.style.width = '0%';
+
+  // 제목이 길면 marquee 애니메이션 적용
+  checkAndApplyMarquee();
 
   // YouTube Player에 영상 로드
   if (isPlayerReady && player) {
@@ -549,10 +592,17 @@ function createMusicListItem(song, index) {
   
   const addBtnItem = document.createElement('button');
   addBtnItem.className = 'add-item-btn-overlay';
-  addBtnItem.innerHTML = '<i class="fas fa-plus-circle"></i>';
-  addBtnItem.addEventListener('click', (e) => {
+  addBtnItem.dataset.videoId = song.videoId;
+
+  // 이미 저장된 곡이면 체크 아이콘, 아니면 플러스 아이콘
+  const isSaved = savedVideoIds.has(song.videoId);
+  addBtnItem.innerHTML = isSaved
+    ? '<i class="fas fa-check-circle"></i>'
+    : '<i class="fas fa-plus-circle"></i>';
+
+  addBtnItem.addEventListener('click', async (e) => {
     e.stopPropagation();
-    saveMusicToHistory(song);
+    await saveMusicToFavorite(song, addBtnItem);
   });
   
   actions.appendChild(playBtnItem);
@@ -594,7 +644,7 @@ function updateListHighlight(index) {
 // 음악 저장 API
 async function saveMusicToHistory(song) {
   console.log('[API] 음악 저장:', song.title);
-  
+
   try {
     const response = await fetch('/api/music/save', {
       method: 'POST',
@@ -607,9 +657,9 @@ async function saveMusicToHistory(song) {
         thumbnailUrl: song.thumbnailUrl
       })
     });
-    
+
     const data = await response.json();
-    
+
     if (response.ok) {
       alert('재생목록에 저장되었습니다!');
     } else {
@@ -617,6 +667,96 @@ async function saveMusicToHistory(song) {
     }
   } catch (error) {
     console.error('[API] 저장 실패:', error);
+    alert('저장에 실패했습니다.');
+  }
+}
+
+// 저장된 즐겨찾기 목록 가져오기
+async function loadSavedFavorites() {
+  console.log('[Favorite] 저장된 곡 목록 로드');
+
+  try {
+    const videoIds = songs.map(song => song.videoId);
+
+    if (videoIds.length === 0) {
+      console.log('[Favorite] 곡이 없어 체크 생략');
+      return;
+    }
+
+    const response = await fetch('/api/favorites/check', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ videoIds })
+    });
+
+    const data = await response.json();
+
+    if (response.ok && data.data.savedVideoIds) {
+      savedVideoIds = new Set(data.data.savedVideoIds);
+      console.log('[Favorite] 저장된 곡:', savedVideoIds.size);
+
+      // UI 업데이트
+      updateMusicList();
+    }
+  } catch (error) {
+    console.error('[Favorite] 목록 로드 실패:', error);
+  }
+}
+
+// 즐겨찾기 저장 API
+async function saveMusicToFavorite(song, buttonElement) {
+  console.log('[Favorite] 즐겨찾기 저장:', song.title);
+
+  // 이미 저장된 곡이면 삭제
+  if (savedVideoIds.has(song.videoId)) {
+    try {
+      const response = await fetch(`/api/favorites/${song.videoId}`, {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' }
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        savedVideoIds.delete(song.videoId);
+        buttonElement.innerHTML = '<i class="fas fa-plus-circle"></i>';
+        console.log('[Favorite] 즐겨찾기에서 삭제됨');
+      } else {
+        alert(data.message || '삭제 실패');
+      }
+    } catch (error) {
+      console.error('[Favorite] 삭제 실패:', error);
+      alert('삭제에 실패했습니다.');
+    }
+    return;
+  }
+
+  // 새로 저장
+  try {
+    const response = await fetch('/api/favorites', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        emotionId: currentEmotionId,
+        emotion: currentEmotion,
+        youtubeVideoId: song.videoId,
+        videoTitle: song.title,
+        channelTitle: song.artist,
+        thumbnailUrl: song.thumbnailUrl
+      })
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      savedVideoIds.add(song.videoId);
+      buttonElement.innerHTML = '<i class="fas fa-check-circle"></i>';
+      console.log('[Favorite] 즐겨찾기에 추가됨');
+    } else {
+      alert(data.message || '저장 실패');
+    }
+  } catch (error) {
+    console.error('[Favorite] 저장 실패:', error);
     alert('저장에 실패했습니다.');
   }
 }
@@ -806,6 +946,70 @@ async function saveMusicToDB(song) {
     console.error('[DB] 음악 저장 오류:', error);
     // 저장 실패해도 재생은 계속됨 (사용자 경험 유지)
   }
+}
+
+// 제목 길이 체크 및 marquee 적용
+function checkAndApplyMarquee() {
+  // 기존 이벤트 리스너 제거를 위해 클래스 제거
+  songTitle.classList.remove('marquee');
+
+  // 기존 애니메이션 종료 이벤트 리스너 제거
+  songTitle.removeEventListener('animationend', restartMarquee);
+
+  // 인라인 애니메이션 제거
+  songTitle.style.animation = 'none';
+
+  // 다음 프레임에서 체크 (DOM 업데이트 대기)
+  setTimeout(() => {
+    const titleWidth = songTitle.scrollWidth;
+    const containerWidth = songTitle.clientWidth;
+
+    console.log(`[Marquee] 제목 너비: ${titleWidth}px, 컨테이너 너비: ${containerWidth}px`);
+
+    // 제목이 컨테이너보다 길면 marquee 적용
+    if (titleWidth > containerWidth) {
+      // 제목 전체가 보이도록 이동 거리 계산 (제목 너비 + 컨테이너 너비)
+      const distance = titleWidth + containerWidth;
+
+      // 100px당 2초로 계산 (속도 조정)
+      const duration = (distance / 100) * 2;
+
+      // 커스텀 키프레임 애니메이션을 인라인으로 적용
+      songTitle.style.animation = `marqueeScroll ${duration}s linear 2s 1`;
+
+      // CSS 변수로 이동 거리 설정
+      songTitle.style.setProperty('--scroll-distance', `-${distance}px`);
+
+      // 애니메이션 종료 후 리셋하고 다시 시작
+      songTitle.addEventListener('animationend', restartMarquee);
+
+      console.log(`[Marquee] 애니메이션 적용 (거리: ${distance}px, 시간: ${duration}초)`);
+    }
+  }, 100);
+}
+
+// 애니메이션 리셋 및 재시작
+function restartMarquee() {
+  // 애니메이션 초기화
+  songTitle.style.animation = 'none';
+
+  // 2초 대기 후 재시작
+  setTimeout(() => {
+    const titleWidth = songTitle.scrollWidth;
+    const containerWidth = songTitle.clientWidth;
+
+    if (titleWidth > containerWidth) {
+      // 이동 거리와 시간 다시 계산
+      const distance = titleWidth + containerWidth;
+      const duration = (distance / 100) * 2;
+
+      // 애니메이션 재적용
+      songTitle.style.animation = `marqueeScroll ${duration}s linear 2s 1`;
+      songTitle.style.setProperty('--scroll-distance', `-${distance}px`);
+
+      console.log('[Marquee] 애니메이션 재시작');
+    }
+  }, 2000);
 }
 
 // 유틸리티

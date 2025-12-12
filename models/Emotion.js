@@ -14,17 +14,8 @@ const emotionSchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  memo: {
-    type: String,
-    default: null
-  },
-  timestamp: {
-    type: Date,
-    default: Date.now,
-    required: true
-  }
 }, {
-  timestamps: false,
+  timestamps: true,
   collection: 'emotions'
 });
 

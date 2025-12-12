@@ -13,7 +13,12 @@ const {
     submitQna,
     deleteAccount,
     getEmotionHistory,
-    getMusicHistory
+    getMusicHistory,
+    saveFavorite,
+    getFavoritesByEmotion,
+    deleteFavorite,
+    checkFavorites,
+    getFavoritesCounts
 } = require('../controllers/mypageController');
 
 // 마이페이지
@@ -40,6 +45,13 @@ router.route("/qna")
 
 router.get("/api/emotions/history", requireAuth, getEmotionHistory);
 router.get("/api/music/history", requireAuth, getMusicHistory);
+
+// 즐겨찾기 API
+router.post("/api/favorites", requireAuth, saveFavorite);
+router.get("/api/favorites", requireAuth, getFavoritesByEmotion);
+router.delete("/api/favorites/:videoId", requireAuth, deleteFavorite);
+router.post("/api/favorites/check", requireAuth, checkFavorites);
+router.get("/api/favorites/count", requireAuth, getFavoritesCounts);
 
 // 회원 탈퇴
 router.post("/withdraw", requireAuth, deleteAccount);

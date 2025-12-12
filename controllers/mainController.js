@@ -21,15 +21,11 @@ const getMusic = asyncHandler(async (req, res) => {
 //@desc Get music list page
 //@route GET /musiclist
 const getMusicList = asyncHandler(async (req, res) => {
-    const mood = req.query.mood || 'happy';
-    
-    // 나중에 DB에서 해당 감정의 음악 리스트 가져오기
-    // const musicList = await getMusicByMood(mood);
-    
+    const emotion = req.query.emotion || 'happy';
+
     res.render("src/favorites_music", {
-        mood: mood,
+        emotion: emotion,
         username: req.user.username
-        // musicList: musicList  // DB 연결 후 추가
     });
 });
 
@@ -181,7 +177,7 @@ const loadMore = asyncHandler(async (req, res) => {
   });
 });
 
-// 음악 저장 API 
+// 음악 저장 API
 // POST /api/music/save
 const saveMusic = asyncHandler(async (req, res) => {
   const { emotionId, videoId, title, channelTitle, thumbnailUrl } = req.body;

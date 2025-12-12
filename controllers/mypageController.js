@@ -1,6 +1,7 @@
 const asyncHandler = require("express-async-handler");
 const Emotion = require("../models/Emotion");
 const MusicHistory = require("../models/MusicHistory");
+const Favorite = require("../models/Favorite");
 const User = require("../models/User");
 const Question = require("../models/Question");
 const bcrypt = require("bcrypt");
@@ -268,6 +269,155 @@ const deleteAccount = asyncHandler(async (req, res) => {
     }
 });
 
+// 즐겨찾기 저장
+// POST /api/favorites
+const saveFavorite = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { emotionId, emotion, youtubeVideoId, videoTitle, channelTitle, thumbnailUrl } = req.body;
+
+  // 필수 필드 검증
+  if (!emotionId || !emotion || !youtubeVideoId || !videoTitle || !channelTitle || !thumbnailUrl) {
+    return res.status(400).json({
+      success: false,
+      message: "필수 정보가 누락되었습니다.",
+    });
+  }
+
+  try {
+    // 이미 저장된 곡인지 확인
+    const existingFavorite = await Favorite.findOne({ userId, youtubeVideoId });
+
+    if (existingFavorite) {
+      return res.status(200).json({
+        success: true,
+        message: "이미 저장된 곡입니다.",
+        data: {
+          favoriteId: existingFavorite._id,
+          alreadyExists: true
+        }
+      });
+    }
+
+    // 새로운 즐겨찾기 저장
+    const newFavorite = new Favorite({
+      userId,
+      emotionId,
+      emotion,
+      youtubeVideoId,
+      videoTitle,
+      channelTitle,
+      thumbnailUrl,
+    });
+
+    await newFavorite.save();
+
+    res.status(201).json({
+      success: true,
+      message: "즐겨찾기에 추가되었습니다.",
+      data: {
+        favoriteId: newFavorite._id,
+        alreadyExists: false
+      },
+    });
+  } catch (error) {
+    console.error("[saveFavorite] 오류:", error);
+    res.status(500).json({
+      success: false,
+      message: "즐겨찾기 저장에 실패했습니다.",
+    });
+  }
+});
+
+// 즐겨찾기 목록 조회 (특정 감정)
+// GET /api/favorites?emotion=happy
+const getFavoritesByEmotion = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { emotion } = req.query;
+
+  if (!emotion) {
+    return res.status(400).json({
+      success: false,
+      message: "감정 정보가 필요합니다.",
+    });
+  }
+
+  const favorites = await Favorite.find({ userId, emotion })
+    .sort({ savedAt: -1 });
+
+  res.status(200).json({
+    success: true,
+    data: favorites,
+  });
+});
+
+// 즐겨찾기 삭제
+// DELETE /api/favorites/:videoId
+const deleteFavorite = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { videoId } = req.params;
+
+  const result = await Favorite.deleteOne({ userId, youtubeVideoId: videoId });
+
+  if (result.deletedCount === 0) {
+    return res.status(404).json({
+      success: false,
+      message: "즐겨찾기를 찾을 수 없습니다.",
+    });
+  }
+
+  res.status(200).json({
+    success: true,
+    message: "즐겨찾기가 삭제되었습니다.",
+  });
+});
+
+// 저장된 곡 목록 조회 (체크 표시용)
+// POST /api/favorites/check
+const checkFavorites = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+  const { videoIds } = req.body;
+
+  if (!videoIds || !Array.isArray(videoIds)) {
+    return res.status(400).json({
+      success: false,
+      message: "videoIds 배열이 필요합니다.",
+    });
+  }
+
+  const favorites = await Favorite.find({
+    userId,
+    youtubeVideoId: { $in: videoIds }
+  }).select('youtubeVideoId');
+
+  const savedVideoIds = favorites.map(fav => fav.youtubeVideoId);
+
+  res.status(200).json({
+    success: true,
+    data: {
+      savedVideoIds
+    }
+  });
+});
+
+// 감정별 즐겨찾기 곡 개수 조회
+// GET /api/favorites/count
+const getFavoritesCounts = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  const emotions = ['happy', 'love', 'sleep', 'crying', 'angry', 'excited'];
+  const counts = {};
+
+  for (const emotion of emotions) {
+    const count = await Favorite.countDocuments({ userId, emotion });
+    counts[emotion] = count;
+  }
+
+  res.status(200).json({
+    success: true,
+    data: counts
+  });
+});
+
 module.exports = {
     getMypage,
     getInfo,
@@ -280,4 +430,9 @@ module.exports = {
     deleteAccount,
     getEmotionHistory,
     getMusicHistory,
+    saveFavorite,
+    getFavoritesByEmotion,
+    deleteFavorite,
+    checkFavorites,
+    getFavoritesCounts,
 };

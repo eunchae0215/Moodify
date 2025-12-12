@@ -1,303 +1,509 @@
-// 자동 재생 설정 확인 함수
+// 현재 감정
+let currentEmotion = window.CURRENT_EMOTION || 'happy';
+
+// YouTube Player
+let player = null;
+let isPlayerReady = false;
+
+// 음악 데이터
+let songs = [];
+let currentIndex = 0;
+let isPlaying = false;
+
+// 자동재생 설정 확인
 function isAutoPlayEnabled() {
   const autoPlay = localStorage.getItem('moodify_auto_play');
-  const result = autoPlay === null || autoPlay === 'true';
-  console.log('[AutoPlay Check] localStorage value:', autoPlay);
-  console.log('[AutoPlay Check] Result:', result ? 'ENABLED' : 'DISABLED');
-  return result;
+  return autoPlay === null || autoPlay === 'true';
 }
 
-// HTML이 완전히 로드된 후 실행
-document.addEventListener('DOMContentLoaded', function() {
-  // URL에서 감정 파라미터 가져오기
-  const urlParams = new URLSearchParams(window.location.search);
-  const mood = urlParams.get('mood') || 'happy';
+// UI 요소
+const favPlayerTitle = document.querySelector('.fav-player-title');
+const favPlayerArtist = document.querySelector('.fav-player-artist');
+const favPlayBtnMain = document.querySelector('.fav-play-btn-main');
+const favPrevBtn = document.querySelector('.fav-prev-btn');
+const favNextBtn = document.querySelector('.fav-next-btn');
+const favProgressBar = document.getElementById('favProgressBar');
+const favProgressFill = document.getElementById('favProgressFill');
+const favCurrentTime = document.getElementById('favCurrentTime');
+const favTotalTime = document.getElementById('favTotalTime');
+const favoritesMusicList = document.getElementById('favoritesMusicList');
+const favoritesMusicTitle = document.getElementById('favoritesMusicTitle');
+const favAlbumThumbnail = document.getElementById('favAlbumThumbnail');
+const favAlbumPlaceholder = document.getElementById('favAlbumPlaceholder');
 
-  // DOM 요소
-  const favMusicPlayerCard = document.getElementById('favMusicPlayerCard');
-  const favClosePlayerBtn = document.getElementById('favClosePlayerBtn');
-  const favoritesMusicTitle = document.getElementById('favoritesMusicTitle');
-  
-  // 플레이어 요소
-  const favPlayBtnMain = document.querySelector('.fav-play-btn-main');
-  const favPrevBtn = document.querySelector('.fav-prev-btn');
-  const favNextBtn = document.querySelector('.fav-next-btn');
-  const favProgressBar = document.querySelector('.fav-progress-bar');
-  const favProgressFill = document.querySelector('.fav-progress-fill');
-  const favPlayerTitle = document.querySelector('.fav-player-title');
-  const favPlayerArtist = document.querySelector('.fav-player-artist');
+const emotionTitles = {
+  happy: '기쁨',
+  love: '사랑',
+  sleep: '졸림',
+  crying: '슬픔',
+  angry: '화남',
+  excited: '신남'
+};
 
-  // 플레이어 상태
-  let isPlayerVisible = true;
-  let currentIndex = 0;
-  let isPlaying = false;
-  let currentTime = 0;
-  let duration = 0;
-  let playInterval = null;
-  let songs = [];
-
-  // 감정별 제목 매핑
-  const moodTitles = {
-    'happy': '기쁨의 Moodify',
-    'love': '사랑의 Moodify',
-    'anxious': '불안의 Moodify',
-    'tired': '피곤의 Moodify',
-    'angry': '화남의 Moodify',
-    'excited': '신남의 Moodify'
-  };
+// 초기화
+async function init() {
+  console.log('[Favorites Music] 초기화 시작');
+  console.log('[Favorites Music] Emotion:', currentEmotion);
 
   // 제목 설정
   if (favoritesMusicTitle) {
-    favoritesMusicTitle.textContent = moodTitles[mood] || '기쁨의 Moodify';
+    favoritesMusicTitle.textContent = `${emotionTitles[currentEmotion] || '기쁨'}의 Moodify`;
   }
 
-  // 음악 리스트 로드 
-  function loadMusicList() {
-    const musicItems = document.querySelectorAll('.favorites-music-item');
-    songs = Array.from(musicItems).map(item => ({
-      title: item.querySelector('.favorites-music-item-title').textContent,
-      artist: item.querySelector('.favorites-music-item-artist').textContent,
-      duration: 180 
-    }));
+  // UI 이벤트 설정
+  setupUIEvents();
+
+  // YouTube API 로드
+  loadYouTubeAPI();
+
+  // 즐겨찾기 목록 로드
+  await loadFavorites();
+}
+
+// YouTube IFrame API 로드
+function loadYouTubeAPI() {
+  console.log('[YouTube] API 로드 시작');
+
+  if (typeof YT !== 'undefined' && YT.Player) {
+    console.log('[YouTube] API 이미 로드됨');
+    onYouTubeIframeAPIReady();
+    return;
   }
 
-  // 초기 음악 리스트 로드
-  loadMusicList();
+  const tag = document.createElement('script');
+  tag.src = 'https://www.youtube.com/iframe_api';
+  const firstScriptTag = document.getElementsByTagName('script')[0];
+  firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+}
 
-  // 페이지 로드 시 첫 번째 곡 로드
+// YouTube API 준비 완료 (전역 함수)
+window.onYouTubeIframeAPIReady = function() {
+  console.log('[YouTube] API 준비 완료');
+
+  player = new YT.Player('ytplayer', {
+    height: '0',
+    width: '0',
+    events: {
+      'onReady': onPlayerReady,
+      'onStateChange': onPlayerStateChange
+    }
+  });
+};
+
+function onPlayerReady(event) {
+  console.log('[YouTube] 플레이어 준비 완료');
+  isPlayerReady = true;
+
   if (songs.length > 0) {
     loadSong(0);
   }
+}
 
-  // 재생 버튼 클릭 이벤트 
-  document.body.addEventListener('click', (e) => {
-    // 재생 버튼 클릭
-    if (e.target.closest('.favorites-play-btn')) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      const playBtn = e.target.closest('.favorites-play-btn');
-      const musicItem = playBtn.closest('.favorites-music-item');
-      
-      if (!musicItem) {
-        console.log('음악 아이템을 찾을 수 없습니다');
+function onPlayerStateChange(event) {
+  if (event.data === YT.PlayerState.ENDED) {
+    console.log('[Player] 곡 종료');
+    nextSong();
+  }
+}
+
+// 즐겨찾기 목록 로드
+async function loadFavorites() {
+  console.log('[Favorites] 즐겨찾기 로드:', currentEmotion);
+
+  try {
+    const response = await fetch(`/api/favorites?emotion=${currentEmotion}`);
+    const data = await response.json();
+
+    if (response.ok && data.success) {
+      const favorites = data.data;
+      console.log('[Favorites] 로드됨:', favorites.length);
+
+      if (favorites.length === 0) {
+        favoritesMusicList.innerHTML = '<p style="text-align: center; color: #DDE7DD; margin-top: 50px;">저장된 음악이 없습니다.</p>';
         return;
       }
-      
-      // 음악 아이템의 인덱스 찾기
-      const allMusicItems = document.querySelectorAll('.favorites-music-item');
-      const index = Array.from(allMusicItems).indexOf(musicItem);
-      
-      // 음악 정보 가져오기
-      const titleElement = musicItem.querySelector('.favorites-music-item-title');
-      const artistElement = musicItem.querySelector('.favorites-music-item-artist');
-      
-      if (!titleElement || !artistElement) {
-        console.log('음악 정보를 찾을 수 없습니다');
-        return;
+
+      // songs 배열 생성
+      songs = favorites.map(fav => ({
+        videoId: fav.youtubeVideoId,
+        title: fav.videoTitle,
+        artist: fav.channelTitle,
+        thumbnailUrl: fav.thumbnailUrl
+      }));
+
+      // UI 업데이트
+      renderMusicList();
+
+      // 첫 번째 곡 로드
+      if (isPlayerReady && songs.length > 0) {
+        loadSong(0);
       }
-      
-      const title = titleElement.textContent;
-      const artist = artistElement.textContent;
-      
-      console.log('재생 버튼 클릭됨:', title, '-', artist);
-      
-      // 이전 곡 일시정지
-      pauseSong();
-      
-      // 곡 로드
-      currentIndex = index;
-      loadSong(index);
-      
-      console.log('[Favorites] 재생 버튼 클릭');
-      
-      // 자동 재생
-      setTimeout(() => {
-        if (isAutoPlayEnabled()) {
-          console.log('[Favorites] 자동 재생 시작');
-          playSong();
-        } else {
-          console.log('[Favorites] 자동 재생 비활성화 - 수동 재생 필요');
-        }
-      }, 100);
+    } else {
+      console.error('[Favorites] 로드 실패:', data.message);
+      favoritesMusicList.innerHTML = '<p style="text-align: center; color: #DDE7DD; margin-top: 50px;">음악 로드에 실패했습니다.</p>';
     }
+  } catch (error) {
+    console.error('[Favorites] 로드 오류:', error);
+    favoritesMusicList.innerHTML = '<p style="text-align: center; color: #DDE7DD; margin-top: 50px;">음악 로드에 실패했습니다.</p>';
+  }
+}
+
+// 음악 리스트 렌더링
+function renderMusicList() {
+  favoritesMusicList.innerHTML = '';
+
+  songs.forEach((song, index) => {
+    const item = createMusicItem(song, index);
+    favoritesMusicList.appendChild(item);
+  });
+}
+
+// 음악 아이템 생성
+function createMusicItem(song, index) {
+  const item = document.createElement('div');
+  item.className = 'favorites-music-item';
+  item.dataset.index = index;
+
+  const thumbnail = document.createElement('div');
+  thumbnail.className = 'favorites-music-thumbnail';
+  const img = document.createElement('img');
+  img.src = song.thumbnailUrl;
+  img.style.width = '100%';
+  img.style.height = '100%';
+  img.style.objectFit = 'cover';
+  thumbnail.appendChild(img);
+
+  const details = document.createElement('div');
+  details.className = 'favorites-music-details';
+  const title = document.createElement('h3');
+  title.className = 'favorites-music-item-title';
+  title.textContent = song.title;
+  const artist = document.createElement('p');
+  artist.className = 'favorites-music-item-artist';
+  artist.textContent = song.artist;
+  details.appendChild(title);
+  details.appendChild(artist);
+
+  const actions = document.createElement('div');
+  actions.className = 'favorites-music-actions';
+
+  const playBtn = document.createElement('button');
+  playBtn.className = 'favorites-play-btn';
+  playBtn.innerHTML = '<i class="fas fa-play"></i>';
+  playBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    loadSong(index, true); // 재생 버튼 클릭 시 자동재생
+    playSong();
   });
 
-  // 곡 로드
-  function loadSong(index) {
-    if (index < 0 || index >= songs.length || songs.length === 0) return;
-    
-    currentIndex = index;
-    const song = songs[index];
-    
-    favPlayerTitle.textContent = song.title;
-    favPlayerArtist.textContent = song.artist;
-    duration = song.duration;
-    currentTime = 0;
-    
-    // 시간 텍스트 업데이트
-    const currentTimeEl = document.getElementById('favCurrentTime');
-    const totalTimeEl = document.getElementById('favTotalTime');
-    
-    if (currentTimeEl) {
-      currentTimeEl.textContent = formatTime(0);
-    }
-    if (totalTimeEl) {
-      totalTimeEl.textContent = formatTime(duration);
-    }
-    
-    if (favProgressBar) {
-      favProgressBar.max = duration;
-      favProgressBar.value = 0;
-    }
-    if (favProgressFill) {
-      favProgressFill.style.width = '0%';
-    }
-    
-    // 리스트 하이라이트 업데이트
-    updateListHighlight(index);
+  const deleteBtn = document.createElement('button');
+  deleteBtn.className = 'favorites-add-btn';
+  deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+  deleteBtn.addEventListener('click', async (e) => {
+    e.stopPropagation();
+    await deleteFavorite(song.videoId, index);
+  });
+
+  actions.appendChild(playBtn);
+  actions.appendChild(deleteBtn);
+
+  item.appendChild(thumbnail);
+  item.appendChild(details);
+  item.appendChild(actions);
+
+  item.addEventListener('click', () => {
+    loadSong(index);
+  });
+
+  return item;
+}
+
+// 즐겨찾기 삭제
+async function deleteFavorite(videoId, index) {
+  if (!confirm('이 곡을 즐겨찾기에서 삭제하시겠습니까?')) {
+    return;
   }
 
-  // 리스트 하이라이트 업데이트
-  function updateListHighlight(index) {
-    const musicItems = document.querySelectorAll('.favorites-music-item');
-    musicItems.forEach((item, i) => {
-      if (i === index) {
-        item.classList.add('active');
-      } else {
-        item.classList.remove('active');
-      }
+  try {
+    const response = await fetch(`/api/favorites/${videoId}`, {
+      method: 'DELETE'
     });
-  }
 
-  // 재생
-  function playSong() {
-    isPlaying = true;
-    if (favPlayBtnMain) {
-      favPlayBtnMain.innerHTML = '<i class="fas fa-pause"></i>';
-    }
-    
-    playInterval = setInterval(() => {
-      if (currentTime < duration) {
-        currentTime++;
-        updateProgress();
-      } else {
-        pauseSong();
-        // 다음 곡 자동 재생
-        if (currentIndex < songs.length - 1) {
-          loadSong(currentIndex + 1);
-          setTimeout(() => playSong(), 300);
-        } else {
-          currentTime = 0;
-          updateProgress();
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log('[Favorites] 삭제 성공');
+
+      // 현재 재생 중인 곡이면 다음 곡으로
+      if (index === currentIndex) {
+        nextSong();
+      } else if (index < currentIndex) {
+        currentIndex--;
+      }
+
+      // songs 배열에서 제거
+      songs.splice(index, 1);
+
+      // UI 업데이트
+      renderMusicList();
+
+      if (songs.length === 0) {
+        favoritesMusicList.innerHTML = '<p style="text-align: center; color: #DDE7DD; margin-top: 50px;">저장된 음악이 없습니다.</p>';
+        if (player && isPlayerReady) {
+          player.stopVideo();
         }
       }
-    }, 1000);
+    } else {
+      alert(data.message || '삭제 실패');
+    }
+  } catch (error) {
+    console.error('[Favorites] 삭제 오류:', error);
+    alert('삭제에 실패했습니다.');
+  }
+}
+
+// 곡 로드
+function loadSong(index, autoPlay = null) {
+  if (!isPlayerReady || songs.length === 0) {
+    console.log('[Player] 플레이어 준비 안 됨 또는 곡 없음');
+    return;
   }
 
-  // 일시정지
-  function pauseSong() {
+  currentIndex = index;
+  const song = songs[currentIndex];
+
+  console.log('[Player] 곡 로드:', song.title);
+
+  // UI 업데이트
+  favPlayerTitle.textContent = song.title;
+  favPlayerArtist.textContent = song.artist;
+
+  // 썸네일 업데이트
+  if (song.thumbnailUrl && favAlbumThumbnail && favAlbumPlaceholder) {
+    favAlbumThumbnail.src = song.thumbnailUrl;
+    favAlbumThumbnail.style.display = 'block';
+    favAlbumPlaceholder.style.display = 'none';
+  } else {
+    favAlbumThumbnail.style.display = 'none';
+    favAlbumPlaceholder.style.display = 'flex';
+  }
+
+  // 제목 marquee 체크
+  checkAndApplyMarquee();
+
+  // 자동재생 설정 확인
+  const shouldAutoPlay = autoPlay !== null ? autoPlay : isAutoPlayEnabled();
+
+  // 플레이어 로드 (자동재생 여부에 따라)
+  if (shouldAutoPlay) {
+    player.loadVideoById(song.videoId);
+    isPlaying = true;
+    updatePlayButton();
+    startProgressUpdate();
+  } else {
+    player.cueVideoById(song.videoId);
     isPlaying = false;
-    if (favPlayBtnMain) {
-      favPlayBtnMain.innerHTML = '<i class="fas fa-play"></i>';
+    updatePlayButton();
+  }
+
+  // 하이라이트 업데이트
+  updateListHighlight(index);
+}
+
+// 재생/일시정지
+function playSong() {
+  if (!isPlayerReady) return;
+
+  player.playVideo();
+  isPlaying = true;
+  updatePlayButton();
+  startProgressUpdate();
+}
+
+function pauseSong() {
+  if (!isPlayerReady) return;
+
+  player.pauseVideo();
+  isPlaying = false;
+  updatePlayButton();
+  stopProgressUpdate();
+}
+
+function togglePlay() {
+  if (isPlaying) {
+    pauseSong();
+  } else {
+    playSong();
+  }
+}
+
+// 이전/다음 곡
+function prevSong() {
+  if (songs.length === 0) return;
+
+  currentIndex = (currentIndex - 1 + songs.length) % songs.length;
+  loadSong(currentIndex, true); // 이전/다음 버튼은 자동재생
+  playSong();
+}
+
+function nextSong() {
+  if (songs.length === 0) return;
+
+  currentIndex = (currentIndex + 1) % songs.length;
+  loadSong(currentIndex, true); // 이전/다음 버튼은 자동재생
+  playSong();
+}
+
+// 리스트 하이라이트 업데이트
+function updateListHighlight(index) {
+  const items = document.querySelectorAll('.favorites-music-item');
+  items.forEach((item, i) => {
+    if (i === index) {
+      item.classList.add('active');
+    } else {
+      item.classList.remove('active');
     }
-    if (playInterval) {
-      clearInterval(playInterval);
-      playInterval = null;
+  });
+}
+
+// 재생 버튼 아이콘 업데이트
+function updatePlayButton() {
+  const icon = favPlayBtnMain.querySelector('i');
+  if (isPlaying) {
+    icon.className = 'fas fa-pause';
+  } else {
+    icon.className = 'fas fa-play';
+  }
+}
+
+// 진행바 업데이트
+let progressInterval = null;
+
+function startProgressUpdate() {
+  if (progressInterval) return;
+
+  progressInterval = setInterval(() => {
+    if (!isPlayerReady || !player.getCurrentTime) return;
+
+    const current = player.getCurrentTime();
+    const total = player.getDuration();
+
+    if (total > 0) {
+      const progress = (current / total) * 100;
+      favProgressBar.value = progress;
+      favProgressFill.style.width = `${progress}%`;
+
+      favCurrentTime.textContent = formatTime(current);
+      favTotalTime.textContent = formatTime(total);
     }
-  }
+  }, 1000);
+}
 
-  // 진행률 업데이트
-  function updateProgress() {
-    // 시간 텍스트 업데이트
-    const currentTimeEl = document.getElementById('favCurrentTime');
-    const totalTimeEl = document.getElementById('favTotalTime');
-    
-    if (currentTimeEl) {
-      currentTimeEl.textContent = formatTime(currentTime);
+function stopProgressUpdate() {
+  if (progressInterval) {
+    clearInterval(progressInterval);
+    progressInterval = null;
+  }
+}
+
+// 시간 포맷
+function formatTime(seconds) {
+  if (isNaN(seconds) || seconds < 0) return '0:00';
+
+  const mins = Math.floor(seconds / 60);
+  const secs = Math.floor(seconds % 60);
+  return `${mins}:${String(secs).padStart(2, '0')}`;
+}
+
+// UI 이벤트 설정
+function setupUIEvents() {
+  // 재생/일시정지
+  favPlayBtnMain.addEventListener('click', togglePlay);
+
+  // 이전/다음 곡
+  favPrevBtn.addEventListener('click', prevSong);
+  favNextBtn.addEventListener('click', nextSong);
+
+  // 진행바 클릭
+  favProgressBar.addEventListener('input', (e) => {
+    if (!isPlayerReady) return;
+
+    const progress = e.target.value;
+    const duration = player.getDuration();
+    const seekTo = (progress / 100) * duration;
+
+    player.seekTo(seekTo, true);
+  });
+}
+
+// Marquee 기능
+function checkAndApplyMarquee() {
+  if (!favPlayerTitle) return;
+
+  // marquee 초기화
+  favPlayerTitle.classList.remove('marquee');
+  favPlayerTitle.removeEventListener('animationend', restartMarquee);
+  favPlayerTitle.style.animation = 'none';
+
+  // 다음 프레임에서 체크 (DOM 업데이트 대기)
+  setTimeout(() => {
+    const titleWidth = favPlayerTitle.scrollWidth;
+    const containerWidth = favPlayerTitle.clientWidth;
+
+    console.log(`[Marquee] 제목 너비: ${titleWidth}px, 컨테이너 너비: ${containerWidth}px`);
+
+    // 제목이 컨테이너보다 길면 marquee 적용
+    if (titleWidth > containerWidth) {
+      // 제목 전체가 보이도록 이동 거리 계산 (제목 너비 + 컨테이너 너비)
+      const distance = titleWidth + containerWidth;
+
+      // 100px당 2초로 계산 (속도 조정)
+      const duration = (distance / 100) * 2;
+
+      // 커스텀 키프레임 애니메이션을 인라인으로 적용
+      favPlayerTitle.style.animation = `marqueeScroll ${duration}s linear 2s 1`;
+
+      // CSS 변수로 이동 거리 설정
+      favPlayerTitle.style.setProperty('--scroll-distance', `-${distance}px`);
+
+      // 애니메이션 종료 시 재시작
+      favPlayerTitle.addEventListener('animationend', restartMarquee);
+
+      console.log(`[Marquee] 애니메이션 적용 (거리: ${distance}px, 시간: ${duration}초)`);
     }
-    if (totalTimeEl) {
-      totalTimeEl.textContent = formatTime(duration);
+  }, 100);
+}
+
+function restartMarquee() {
+  if (!favPlayerTitle) return;
+
+  // 애니메이션 초기화
+  favPlayerTitle.style.animation = 'none';
+
+  // 2초 대기 후 재시작
+  setTimeout(() => {
+    const titleWidth = favPlayerTitle.scrollWidth;
+    const containerWidth = favPlayerTitle.clientWidth;
+
+    if (titleWidth > containerWidth) {
+      // 이동 거리와 시간 다시 계산
+      const distance = titleWidth + containerWidth;
+      const duration = (distance / 100) * 2;
+
+      // 애니메이션 재적용
+      favPlayerTitle.style.animation = `marqueeScroll ${duration}s linear 2s 1`;
+      favPlayerTitle.style.setProperty('--scroll-distance', `-${distance}px`);
+
+      console.log('[Marquee] 애니메이션 재시작');
     }
-    
-    if (favProgressBar) {
-      favProgressBar.value = currentTime;
-    }
-    if (favProgressFill) {
-      const percentage = (currentTime / duration) * 100;
-      favProgressFill.style.width = `${percentage}%`;
-    }
-  }
+  }, 2000);
+}
 
-  // 시간 포맷 함수
-  function formatTime(seconds) {
-    if (isNaN(seconds)) return '0:00';
-    const mins = Math.floor(seconds / 60);
-    const secs = Math.floor(seconds % 60);
-    return `${mins}:${secs < 10 ? '0' : ''}${secs}`;
-  }
+// YouTube Player div 추가 (숨김)
+const ytPlayerDiv = document.createElement('div');
+ytPlayerDiv.id = 'ytplayer';
+ytPlayerDiv.style.display = 'none';
+document.body.appendChild(ytPlayerDiv);
 
-  // 재생/일시정지 버튼
-  if (favPlayBtnMain) {
-    favPlayBtnMain.addEventListener('click', () => {
-      if (isPlaying) {
-        pauseSong();
-      } else {
-        playSong();
-      }
-    });
-  }
-
-  // 이전 곡 버튼
-  if (favPrevBtn) {
-    favPrevBtn.addEventListener('click', () => {
-      if (currentIndex > 0) {
-        pauseSong();
-        loadSong(currentIndex - 1);
-        setTimeout(() => playSong(), 100);
-      }
-    });
-  }
-
-  // 다음 곡 버튼
-  if (favNextBtn) {
-    favNextBtn.addEventListener('click', () => {
-      if (currentIndex < songs.length - 1) {
-        pauseSong();
-        loadSong(currentIndex + 1);
-        setTimeout(() => playSong(), 100);
-      }
-    });
-  }
-
-  // 재생바 조작
-  if (favProgressBar) {
-    favProgressBar.addEventListener('input', () => {
-      currentTime = parseInt(favProgressBar.value);
-      updateProgress();
-    });
-  }
-
-  // 재생 카드 닫기 버튼
-  if (favClosePlayerBtn) {
-    favClosePlayerBtn.addEventListener('click', () => {
-      isPlayerVisible = false;
-      favMusicPlayerCard.classList.remove('visible');
-      pauseSong();
-    });
-  }
-
-  console.log('현재 감정:', mood);
-  console.log('로드된 음악 수:', songs.length);
-
-  // 페이지 진입 시 자동 재생
-  console.log('[Favorites] 페이지 로드 완료 - 자동재생 체크');
-  if (songs.length > 0 && isAutoPlayEnabled()) {
-    console.log('[Favorites] 페이지 진입 시 자동 재생 시작');
-    setTimeout(() => {
-      playSong();
-    }, 500);
-  } else if (!isAutoPlayEnabled()) {
-    console.log('[Favorites] 자동 재생 비활성화됨');
-  }
-});
+// 초기화 실행
+init();

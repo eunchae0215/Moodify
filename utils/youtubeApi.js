@@ -76,7 +76,7 @@ const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
         q: keyword,
         type: 'video',
         videoCategoryId: '10', // 10 = Music 카테고리
-        videoDuration: 'medium', // 🆕 추가: 0~4분 영상만
+        videoDuration: 'short', // 🆕 추가: 0~4분 영상만
         videoEmbeddable: 'true', // 🆕 추가: 임베드 가능한 영상만
         videoSyndicated: 'true', // 🆕 추가: 외부 재생 가능한 영상만
         maxResults: Math.min(maxResults * 2, 50), // 필터링 고려해 2배 요청 (최대 50)
@@ -279,5 +279,6 @@ module.exports = {
   validateApiKey,
   parseDuration,
   formatDuration,
-  previewSearch
+  previewSearch,
+  getVideoDetails
 };

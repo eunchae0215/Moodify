@@ -27,7 +27,7 @@ app.use(methodOverride("_method"));
 
 app.use("/", require("./routes/loginRoutes"));
 app.use("/", require("./routes/mainRoutes"));
-app.use("/", require("./routes/mypageRoutes")); 
+app.use("/", require("./routes/mypageRoutes"));
 
 app.use((req, res) => {
   res.status(404).send('페이지를 찾을 수 없습니다.');

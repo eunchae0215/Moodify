@@ -33,6 +33,8 @@ document.addEventListener('DOMContentLoaded', function() {
   const progressFill = document.querySelector('.progress-fill');
   const playerTitle = document.querySelector('.player-title');
   const playerArtist = document.querySelector('.player-artist');
+  const albumThumbnail = document.getElementById('albumThumbnail');
+  const albumPlaceholder = document.getElementById('albumPlaceholder');
   const closePlayerBtn = document.getElementById('closePlayerBtn');
   const togglePlayerBtn = document.getElementById("togglePlayerBtn");
 
@@ -269,9 +271,23 @@ document.addEventListener('DOMContentLoaded', function() {
     
     currentIndex = index;
     const song = songs[index];
-    
-    if (playerTitle) playerTitle.textContent = song.title;
+
+    if (playerTitle) {
+      playerTitle.textContent = song.title;
+      checkAndApplyPlayerMarquee();
+    }
     if (playerArtist) playerArtist.textContent = song.artist;
+
+    // 썸네일 업데이트
+    if (song.thumbnailUrl && albumThumbnail && albumPlaceholder) {
+      albumThumbnail.src = song.thumbnailUrl;
+      albumThumbnail.style.display = 'block';
+      albumPlaceholder.style.display = 'none';
+    } else if (albumThumbnail && albumPlaceholder) {
+      albumThumbnail.style.display = 'none';
+      albumPlaceholder.style.display = 'flex';
+    }
+
     duration = song.duration;
     currentTime = 0;
     
@@ -511,6 +527,74 @@ document.addEventListener('DOMContentLoaded', function() {
     currentMonth = parseInt(e.target.value);
     renderCalendar(currentYear, currentMonth);
   });
+
+  // 플레이어 제목 marquee 재시작
+  function restartPlayerMarquee() {
+    if (!playerTitle) return;
+
+    // 애니메이션 초기화
+    playerTitle.style.animation = 'none';
+
+    // 2초 대기 후 재시작
+    setTimeout(() => {
+      const titleWidth = playerTitle.scrollWidth;
+      const containerWidth = playerTitle.clientWidth;
+
+      if (titleWidth > containerWidth) {
+        // 이동 거리와 시간 다시 계산
+        const distance = titleWidth + containerWidth;
+        const duration = (distance / 100) * 2;
+
+        // 애니메이션 재적용
+        playerTitle.style.animation = `marqueeScroll ${duration}s linear 2s 1`;
+        playerTitle.style.setProperty('--scroll-distance', `-${distance}px`);
+
+        console.log('[Player Marquee] 애니메이션 재시작');
+      }
+    }, 2000);
+  }
+
+  // 플레이어 제목 길이 체크 및 marquee 적용
+  function checkAndApplyPlayerMarquee() {
+    if (!playerTitle) return;
+
+    // marquee 클래스 제거 (초기화)
+    playerTitle.classList.remove('marquee');
+
+    // 이전 이벤트 리스너 제거
+    playerTitle.removeEventListener('animationend', restartPlayerMarquee);
+
+    // 인라인 애니메이션 제거
+    playerTitle.style.animation = 'none';
+
+    // 다음 프레임에서 체크 (DOM 업데이트 대기)
+    setTimeout(() => {
+      const titleWidth = playerTitle.scrollWidth;
+      const containerWidth = playerTitle.clientWidth;
+
+      console.log(`[Player Marquee] 제목 너비: ${titleWidth}px, 컨테이너 너비: ${containerWidth}px`);
+
+      // 제목이 컨테이너보다 길면 marquee 적용
+      if (titleWidth > containerWidth) {
+        // 제목 전체가 보이도록 이동 거리 계산 (제목 너비 + 컨테이너 너비)
+        const distance = titleWidth + containerWidth;
+
+        // 100px당 2초로 계산 (속도 조정)
+        const duration = (distance / 100) * 2;
+
+        // 커스텀 키프레임 애니메이션을 인라인으로 적용
+        playerTitle.style.animation = `marqueeScroll ${duration}s linear 2s 1`;
+
+        // CSS 변수로 이동 거리 설정
+        playerTitle.style.setProperty('--scroll-distance', `-${distance}px`);
+
+        // 애니메이션 종료 시 재시작
+        playerTitle.addEventListener('animationend', restartPlayerMarquee);
+
+        console.log(`[Player Marquee] 애니메이션 적용 (거리: ${distance}px, 시간: ${duration}초)`);
+      }
+    }, 100);
+  }
 
   // 초기화
   initYearSelect();

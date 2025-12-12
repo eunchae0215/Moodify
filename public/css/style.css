@@ -834,6 +834,7 @@ body {
   width: 350px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   backdrop-filter: blur(10px);
+  overflow: hidden;
 }
 
 /* 앨범 아트 배경 */
@@ -856,6 +857,9 @@ body {
 .song-info {
   text-align: center;
   margin-bottom: 25px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .song-title {
@@ -863,11 +867,42 @@ body {
   font-weight: bold;
   color: #DDE7DD;
   margin-bottom: 8px;
+  white-space: nowrap;
+  display: inline-block;
+  width: 100%;
+}
+
+/* 제목 스크롤 애니메이션 */
+.song-title.marquee {
+  animation: marquee 12s linear 1;
+  text-align: left;
+}
+
+@keyframes marquee {
+  0%, 16.67% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* 픽셀 기반 스크롤 애니메이션 */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(var(--scroll-distance, -100%));
+  }
 }
 
 .song-artist {
   font-size: 16px;
   color: #DDE7DD;
+  max-width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
 }
 
 /* 재생 컨트롤 */
@@ -1131,10 +1166,10 @@ body {
 /* 음악 리스트 오버레이 (오른쪽에서 슬라이드) */
 .list-section-overlay {
   position: fixed;
-  top: -10px;
+  top: 0px;
   right: 0px;
   width: 1065px;
-  height: 93%;
+  height: 91%;
   overflow-y: auto;
   padding: 20px;
   padding-bottom: 20px; 
@@ -1430,4 +1465,4 @@ body {
   100% {
     background-position: -200% 0;
   }
-}
+}@keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } } @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }

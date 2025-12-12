@@ -739,6 +739,7 @@ p {
   transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 0;
   pointer-events: none;
+  overflow: hidden;
 }
 
 .music-player-card.visible {
@@ -754,42 +755,53 @@ p {
 
 /* 앨범 아트 */
 .player-album-art {
-  width: 85%;
-  margin-bottom: 15px;
-  align-items: center;
-  justify-content: center;
-  padding-left: 50px;
-}
-
-.album-placeholder {
   width: 100%;
-  aspect-ratio: 1;
-  background: #DDE7DD;
-  border-radius: 15px;
-  display: flex;
+  margin-bottom: 25px;
   align-items: center;
   justify-content: center;
-}
-
-.album-placeholder i {
-  font-size: 100px;
-  color: rgba(32, 46, 37, 0.623);
 }
 
 /* 재생 정보 */
 .player-info {
   text-align: center;
   margin-bottom: 25px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .player-title {
   font-size: 24px;
   font-weight: bold;
   color: #DDE7DD;
-  margin: 0 0 8px 0;
+  margin-bottom: 8px;
+  max-width: 100%;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: inline-block;
+}
+
+/* 플레이어 제목 스크롤 애니메이션 */
+.player-title.marquee {
+  animation: marquee 12s linear 1;
+}
+
+@keyframes marquee {
+  0%, 16.67% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+/* 픽셀 기반 스크롤 애니메이션 */
+@keyframes marqueeScroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(var(--scroll-distance, -100%));
+  }
 }
 
 .player-artist {
@@ -1201,32 +1213,19 @@ p {
 
 /* 앨범 아트 */
 .fav-player-album-art {
-  width: 85%;
-  margin-bottom: 15px;
-  align-items: center;
-  justify-content: center;
-  padding-left: 50px;
-}
-
-.fav-album-placeholder {
   width: 100%;
-  aspect-ratio: 1;
-  background: #DDE7DD;
-  border-radius: 15px;
-  display: flex;
+  margin-bottom: 25px;
   align-items: center;
   justify-content: center;
-}
-
-.fav-album-placeholder i {
-  font-size: 100px;
-  color: rgba(32, 46, 37, 0.623);
 }
 
 /* 재생 정보 */
 .fav-player-info {
   text-align: center;
   margin-bottom: 25px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
 }
 
 .fav-player-title {
@@ -1234,9 +1233,10 @@ p {
   font-weight: bold;
   color: #DDE7DD;
   margin: 0 0 8px 0;
-  white-space: nowrap;
+  max-width: 100%;
   overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: inline-block;
 }
 
 .fav-player-artist {
