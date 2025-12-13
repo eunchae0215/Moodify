@@ -27,10 +27,6 @@ const musicHistorySchema = new mongoose.Schema({
     type: String,
     required: true
   },
-  liked: {
-    type: Boolean,
-    default: false
-  },
   playedAt: {
     type: Date,
     default: Date.now,
@@ -49,7 +45,6 @@ const musicHistorySchema = new mongoose.Schema({
 musicHistorySchema.index({ userId: 1 });
 musicHistorySchema.index({ emotionId: 1 });
 musicHistorySchema.index({ playedAt: -1 });
-musicHistorySchema.index({ userId: 1, playedAt: -1 });  
-musicHistorySchema.index({ userId: 1, liked: 1 }); 
+musicHistorySchema.index({ userId: 1, playedAt: -1 }); 
 
 module.exports = mongoose.model('MusicHistory', musicHistorySchema);

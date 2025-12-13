@@ -129,9 +129,9 @@ const getEmotionHistory = asyncHandler(async (req, res) => {
   const query = { userId };
 
   if (startDate || endDate) {
-    query.timestamp = {};
-    if (startDate) query.timestamp.$gte = new Date(startDate);
-    if (endDate) query.timestamp.$lte = new Date(endDate);
+    query.createdAt = {};
+    if (startDate) query.createdAt.$gte = new Date(startDate);
+    if (endDate) query.createdAt.$lte = new Date(endDate);
   }
 
   if (emotion) {
@@ -139,7 +139,7 @@ const getEmotionHistory = asyncHandler(async (req, res) => {
   }
 
   // 감정 히스토리 조회
-  const emotions = await Emotion.find(query).sort({ timestamp: -1 }).limit(100);
+  const emotions = await Emotion.find(query).sort({ createdAt: -1 }).limit(100);
 
   res.status(200).json({
     success: true,
@@ -155,7 +155,7 @@ const getEmotionHistory = asyncHandler(async (req, res) => {
 // GET /api/music/history
 const getMusicHistory = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-  const { emotionId, liked } = req.query;
+  const { emotionId } = req.query;
 
   // 쿼리 조건 생성
   const query = { userId };
@@ -164,15 +164,10 @@ const getMusicHistory = asyncHandler(async (req, res) => {
     query.emotionId = emotionId;
   }
 
-  if (liked !== undefined) {
-    query.liked = liked === "true";
-  }
-
-  // 음악 히스토리 조회
+  // 음악 히스토리 조회 (모든 데이터)
   const musicHistory = await MusicHistory.find(query)
     .sort({ playedAt: -1 })
-    .limit(100)
-    .populate("emotionId", "emotion emoji timestamp");
+    .populate("emotionId", "emotion emoji createdAt");
 
   res.status(200).json({
     success: true,
@@ -189,8 +184,6 @@ const getMusicHistory = asyncHandler(async (req, res) => {
 const submitQna = asyncHandler(async (req, res) => {
     const { content } = req.body;
     const userId = req.user.id;
-    const username = req.user.username;
-    const userID = req.user.userID;
 
     // 내용 유효성 검증
     if (!content || content.trim().length === 0) {
@@ -203,12 +196,10 @@ const submitQna = asyncHandler(async (req, res) => {
     // Q&A 저장
     const newQna = await Question.create({
         userId,
-        username,
-        userID,
         content: content.trim()
     });
 
-    console.log(`[QnA] 새 문의 등록: ${username} (${userID})`);
+    console.log(`[QnA] 새 문의 등록: ${req.user.username} (${req.user.userID})`);
 
     res.status(201).json({
         success: true,
@@ -418,6 +409,37 @@ const getFavoritesCounts = asyncHandler(async (req, res) => {
   });
 });
 
+// 사용자 프로필 초기화 (추천 시스템 리셋)
+// POST /api/user/reset-profile
+const resetUserProfile = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  console.log(`[Profile Reset] 사용자 프로필 초기화 요청: ${req.user.username} (${req.user.userID})`);
+
+  try {
+    // UserProfile 삭제
+    const UserProfile = require('../models/UserProfile');
+    const result = await UserProfile.deleteOne({ userId });
+
+    console.log(`[Profile Reset] UserProfile 삭제 완료: ${result.deletedCount}개`);
+
+    res.status(200).json({
+      success: true,
+      message: "추천 시스템이 초기화되었습니다. 다음 음악 재생 시 새로운 프로필이 생성됩니다.",
+      data: {
+        deletedCount: result.deletedCount
+      }
+    });
+
+  } catch (error) {
+    console.error('[Profile Reset] 초기화 실패:', error);
+    res.status(500).json({
+      success: false,
+      message: "프로필 초기화 중 오류가 발생했습니다."
+    });
+  }
+});
+
 module.exports = {
     getMypage,
     getInfo,
@@ -435,4 +457,5 @@ module.exports = {
     deleteFavorite,
     checkFavorites,
     getFavoritesCounts,
+    resetUserProfile,
 };

@@ -56,4 +56,7 @@ router.get("/api/favorites/count", requireAuth, getFavoritesCounts);
 // 회원 탈퇴
 router.post("/withdraw", requireAuth, deleteAccount);
 
+// 사용자 프로필 삭제 (추천 초기화)
+router.post("/api/user/reset-profile", requireAuth, require('../controllers/mypageController').resetUserProfile);
+
 module.exports = router;

@@ -20,7 +20,7 @@ const emotionSchema = new mongoose.Schema({
 });
 
 emotionSchema.index({ userId: 1 });
-emotionSchema.index({ timestamp: -1 });
-emotionSchema.index({ userId: 1, timestamp: -1 });
+emotionSchema.index({ createdAt: -1 });
+emotionSchema.index({ userId: 1, createdAt: -1 });
 
 module.exports = mongoose.model('Emotion', emotionSchema);

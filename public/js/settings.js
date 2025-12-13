@@ -58,26 +58,31 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
   // 데이터 삭제 버튼
-  confirmDeleteBtn.addEventListener('click', () => {
-    // TODO: 서버에 데이터 삭제 요청
-    // fetch('/api/user/delete-data', { method: 'POST' })
-    //   .then(response => response.json())
-    //   .then(data => {
-    //     if (data.success) {
-    //       alert('모든 데이터가 삭제되었습니다.');
-    //       // 로그인 페이지로 이동
-    //       window.location.href = '/login';
-    //     }
-    //   });
-    
-    // 모달 닫기
-    modalOverlay.classList.remove('visible');
-    
-    // 사용자에게 알림
-    alert('모든 데이터가 삭제되었습니다.');
-    
-    // TODO: 실제로는 로그아웃 후 로그인 페이지로 이동
-    // window.location.href = '/login';
+  confirmDeleteBtn.addEventListener('click', async () => {
+    try {
+      const response = await fetch('/api/user/reset-profile', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+
+      // 모달 닫기
+      modalOverlay.classList.remove('visible');
+
+      if (data.success) {
+        alert(data.message);
+        console.log(`[Profile Reset] 초기화 완료: ${data.data.deletedCount}개 삭제됨`);
+      } else {
+        alert('프로필 초기화에 실패했습니다: ' + data.message);
+      }
+    } catch (error) {
+      console.error('[Profile Reset] 오류:', error);
+      modalOverlay.classList.remove('visible');
+      alert('프로필 초기화 중 오류가 발생했습니다.');
+    }
   });
 
   // 저장하기 버튼

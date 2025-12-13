@@ -38,7 +38,7 @@ const getLatestEmotion = asyncHandler(async (req, res) => {
 
   // 가장 최근 감정 조회
   const latestEmotion = await Emotion.findOne({ userId })
-    .sort({ timestamp: -1 })
+    .sort({ createdAt: -1 })
     .limit(1);
 
   if (!latestEmotion) {
@@ -56,7 +56,7 @@ const getLatestEmotion = asyncHandler(async (req, res) => {
       emotionId: latestEmotion._id,
       emotion: latestEmotion.emotion,
       emoji: latestEmotion.emoji,
-      timestamp: latestEmotion.timestamp,
+      createdAt: latestEmotion.createdAt,
     },
   });
 });
@@ -64,7 +64,7 @@ const getLatestEmotion = asyncHandler(async (req, res) => {
 // 감정 저장 API
 // POST /api/emotions
 const saveEmotion = asyncHandler(async (req, res) => {
-  const { emotion, emoji, memo } = req.body;
+  const { emotion, emoji } = req.body;
   const userId = req.user.id;
 
   // 필수 값 체크
@@ -80,8 +80,6 @@ const saveEmotion = asyncHandler(async (req, res) => {
     userId,
     emotion,
     emoji,
-    memo: memo || null,
-    timestamp: new Date(),
   });
 
   await newEmotion.save();
@@ -95,7 +93,7 @@ const saveEmotion = asyncHandler(async (req, res) => {
       emotionId: newEmotion._id,
       emotion: newEmotion.emotion,
       emoji: newEmotion.emoji,
-      timestamp: newEmotion.timestamp,
+      createdAt: newEmotion.createdAt,
     },
   });
 });
