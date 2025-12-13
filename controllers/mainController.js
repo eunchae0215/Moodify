@@ -1,8 +1,13 @@
 const asyncHandler = require("express-async-handler");
 const Emotion = require("../models/Emotion");
 const MusicHistory = require("../models/MusicHistory");
-const { getMultilingualKeywordsBatch } = require("../utils/emtionMapper");
+const UserProfile = require("../models/UserProfile");
+const { getMultilingualKeywordsBatch } = require("../utils/emotionMapper");
 const { searchMultipleKeywords, loadMoreMusic } = require("../utils/youtubeApi");
+const axios = require("axios");
+
+// Python 추천 서버 URL
+const RECOMMENDATION_API_URL = process.env.RECOMMENDATION_API_URL || "http://localhost:5000";
 
 //@desc Get index page
 //@route GET /index
@@ -114,22 +119,101 @@ const recommendMusic = asyncHandler(async (req, res) => {
 
   console.log(`[Music] 음악 추천 요청: ${emotion}, ${count}개 (User: ${req.user.username})`);
 
-  // 1. 다국적 키워드 생성 (언어당 2개씩, 총 6개)
-  const keywords = getMultilingualKeywordsBatch(emotion, 2);
-  console.log(`[Music] 생성된 키워드:`, keywords);
+  // 1. 사용자 재생 기록 조회 (30초 이상 들은 음악만)
+  const playedHistory = await MusicHistory.find({ userId })
+    .populate('emotionId', 'emotion')  // emotion 정보 가져오기
+    .sort({ playedAt: -1 })
+    .limit(20)
+    .select('youtubeVideoId videoTitle channelTitle playedAt emotionId')
+    .lean();
 
-  // 2. YouTube 검색 (키워드당 결과 수 계산)
+  console.log(`[Music] 재생 기록: ${playedHistory.length}개`);
+
+  // 2. 키워드 생성 (재생 기록이 5개 이상이면 Python에서 생성, 아니면 기본 키워드)
+  let keywords = [];
+
+  if (playedHistory.length >= 5) {
+    // Python에서 맞춤 키워드 생성
+    try {
+      const keywordResponse = await axios.post(`${RECOMMENDATION_API_URL}/generate-keywords`, {
+        emotion: emotion,
+        playedHistory: playedHistory.map(music => ({
+          videoId: music.youtubeVideoId,
+          title: music.videoTitle,
+          channelTitle: music.channelTitle,
+          playedAt: music.playedAt,
+          emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
+        }))
+      });
+
+      if (keywordResponse.data.success && keywordResponse.data.data.keywords.length > 0) {
+        keywords = keywordResponse.data.data.keywords;
+        console.log(`[Music] Python 맞춤 키워드 생성 완료:`, keywords);
+      } else {
+        // Python에서 빈 배열 반환 시 기본 키워드 사용
+        keywords = getMultilingualKeywordsBatch(emotion, 2);
+        console.log(`[Music] Python 키워드 생성 실패 - 기본 키워드 사용:`, keywords);
+      }
+    } catch (error) {
+      console.error(`[Music] Python 키워드 생성 실패:`, error.message);
+      keywords = getMultilingualKeywordsBatch(emotion, 2);
+      console.log(`[Music] 기본 키워드 사용:`, keywords);
+    }
+  } else {
+    // 재생 기록이 부족하면 기본 다국어 키워드 사용
+    keywords = getMultilingualKeywordsBatch(emotion, 2);
+    console.log(`[Music] 재생 기록 부족 - 기본 키워드 사용:`, keywords);
+  }
+
+  // 3. YouTube 검색 (키워드당 결과 수 계산)
   const resultsPerKeyword = Math.ceil(count / keywords.length);
-  const musicList = await searchMultipleKeywords(
+  const candidateMusic = await searchMultipleKeywords(
     keywords,
     resultsPerKeyword,
     300, // 5분 이하
     [] // 제외할 비디오 없음
   );
 
-  console.log(`[Music] 검색 완료: ${musicList.length}개`);
+  console.log(`[Music] 검색 완료: ${candidateMusic.length}개`);
 
-  // 3. 결과 반환
+  // 4. Python 추천 서버 호출
+  let musicList = candidateMusic;
+
+  try {
+    const recommendResponse = await axios.post(`${RECOMMENDATION_API_URL}/recommend`, {
+      userId: userId,
+      emotion: emotion,  // 현재 감정 전달
+      candidateMusic: candidateMusic.map(music => ({
+        videoId: music.videoId,
+        title: music.title,
+        description: music.description || '',
+        channelTitle: music.channelTitle,
+        thumbnailUrl: music.thumbnailUrl,
+        duration: music.duration,
+        tags: music.tags || []
+      })),
+      playedHistory: playedHistory.map(music => ({
+        videoId: music.youtubeVideoId,
+        title: music.videoTitle,
+        channelTitle: music.channelTitle,
+        playedAt: music.playedAt,
+        emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
+      }))
+    });
+
+    if (recommendResponse.data.success) {
+      // 추천 결과 사용 (유사도 점수 포함)
+      musicList = recommendResponse.data.data.recommendedMusic;
+      console.log(`[Music] 추천 서버 응답 성공 - ${musicList.length}개 정렬됨`);
+    } else {
+      console.warn(`[Music] 추천 서버 응답 실패 - 원본 순서 사용`);
+    }
+  } catch (error) {
+    console.error(`[Music] 추천 서버 호출 실패:`, error.message);
+    console.log(`[Music] 원본 순서 사용`);
+  }
+
+  // 5. 결과 반환
   res.status(200).json({
     success: true,
     message: "음악 추천이 완료되었습니다.",
@@ -137,12 +221,12 @@ const recommendMusic = asyncHandler(async (req, res) => {
       emotion,
       keywords,
       totalCount: musicList.length,
-      musicList: musicList.slice(0, count), 
+      musicList: musicList.slice(0, count),
     },
   });
 });
 
-// 추가 음악 로딩 API 
+// 추가 음악 로딩 API
 // POST /api/music/load-more
 const loadMore = asyncHandler(async (req, res) => {
   const { emotion, excludeVideoIds = [], count = 30 } = req.body;
@@ -158,13 +242,88 @@ const loadMore = asyncHandler(async (req, res) => {
 
   console.log(`[Music] 추가 로딩 요청: ${emotion}, ${count}개, 제외: ${excludeVideoIds.length}개`);
 
-  // 1. 다국적 키워드 생성
-  const keywords = getMultilingualKeywordsBatch(emotion, 2);
+  // 1. 사용자 재생 기록 조회
+  const playedHistory = await MusicHistory.find({ userId })
+    .populate('emotionId', 'emotion')  // emotion 정보 가져오기
+    .sort({ playedAt: -1 })
+    .limit(20)
+    .select('youtubeVideoId videoTitle channelTitle playedAt emotionId')
+    .lean();
 
-  // 2. 추가 음악 검색 (이미 재생한 곡 제외)
-  const musicList = await loadMoreMusic(emotion, keywords, excludeVideoIds, count, 300);
+  // 2. 키워드 생성 (재생 기록이 5개 이상이면 Python에서 생성, 아니면 기본 키워드)
+  let keywords = [];
 
-  console.log(`[Music] 추가 로딩 완료: ${musicList.length}개`);
+  if (playedHistory.length >= 5) {
+    // Python에서 맞춤 키워드 생성
+    try {
+      const keywordResponse = await axios.post(`${RECOMMENDATION_API_URL}/generate-keywords`, {
+        emotion: emotion,
+        playedHistory: playedHistory.map(music => ({
+          videoId: music.youtubeVideoId,
+          title: music.videoTitle,
+          channelTitle: music.channelTitle,
+          playedAt: music.playedAt,
+          emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
+        }))
+      });
+
+      if (keywordResponse.data.success && keywordResponse.data.data.keywords.length > 0) {
+        keywords = keywordResponse.data.data.keywords;
+        console.log(`[Music] Python 맞춤 키워드 생성 완료:`, keywords);
+      } else {
+        keywords = getMultilingualKeywordsBatch(emotion, 2);
+        console.log(`[Music] Python 키워드 생성 실패 - 기본 키워드 사용:`, keywords);
+      }
+    } catch (error) {
+      console.error(`[Music] Python 키워드 생성 실패:`, error.message);
+      keywords = getMultilingualKeywordsBatch(emotion, 2);
+      console.log(`[Music] 기본 키워드 사용:`, keywords);
+    }
+  } else {
+    keywords = getMultilingualKeywordsBatch(emotion, 2);
+    console.log(`[Music] 재생 기록 부족 - 기본 키워드 사용:`, keywords);
+  }
+
+  // 3. 추가 음악 검색 (이미 재생한 곡 제외)
+  const candidateMusic = await loadMoreMusic(emotion, keywords, excludeVideoIds, count, 300);
+
+  console.log(`[Music] 추가 로딩 완료: ${candidateMusic.length}개`);
+
+  // 4. Python 추천 서버 호출
+  let musicList = candidateMusic;
+
+  try {
+    const recommendResponse = await axios.post(`${RECOMMENDATION_API_URL}/recommend`, {
+      userId: userId,
+      emotion: emotion,  // 현재 감정 전달
+      candidateMusic: candidateMusic.map(music => ({
+        videoId: music.videoId,
+        title: music.title,
+        description: music.description || '',
+        channelTitle: music.channelTitle,
+        thumbnailUrl: music.thumbnailUrl,
+        duration: music.duration,
+        tags: music.tags || []
+      })),
+      playedHistory: playedHistory.map(music => ({
+        videoId: music.youtubeVideoId,
+        title: music.videoTitle,
+        channelTitle: music.channelTitle,
+        playedAt: music.playedAt,
+        emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
+      }))
+    });
+
+    if (recommendResponse.data.success) {
+      musicList = recommendResponse.data.data.recommendedMusic;
+      console.log(`[Music] 추가 로딩 추천 완료 - ${musicList.length}개 정렬됨`);
+    } else {
+      console.warn(`[Music] 추천 서버 응답 실패 - 원본 순서 사용`);
+    }
+  } catch (error) {
+    console.error(`[Music] 추천 서버 호출 실패:`, error.message);
+    console.log(`[Music] 원본 순서 사용`);
+  }
 
   res.status(200).json({
     success: true,
@@ -231,6 +390,83 @@ const saveMusic = asyncHandler(async (req, res) => {
   });
 });
 
+// 사용자 프로필 업데이트 API (30초 이상 재생 시 호출)
+// POST /api/music/update-profile
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const userId = req.user.id;
+
+  console.log(`[Profile] 사용자 프로필 업데이트 요청 (User: ${req.user.username})`);
+
+  try {
+    // 1. 최근 재생 기록 조회 (최근 10개)
+    const playedHistory = await MusicHistory.find({ userId })
+      .sort({ playedAt: -1 })
+      .limit(10)
+      .select('youtubeVideoId videoTitle channelTitle playedAt')
+      .lean();
+
+    if (playedHistory.length === 0) {
+      return res.status(200).json({
+        success: true,
+        message: "재생 기록이 없어 프로필을 업데이트하지 않았습니다.",
+      });
+    }
+
+    console.log(`[Profile] 재생 기록: ${playedHistory.length}개`);
+
+    // 2. Python 서버에 프로필 생성 요청 (추천 API 재사용)
+    // 빈 후보 목록으로 호출하여 사용자 프로필만 생성
+    const profileResponse = await axios.post(`${RECOMMENDATION_API_URL}/recommend`, {
+      userId: userId,
+      candidateMusic: [], // 빈 배열
+      playedHistory: playedHistory.map(music => ({
+        videoId: music.youtubeVideoId,
+        title: music.videoTitle,
+        channelTitle: music.channelTitle,
+        playedAt: music.playedAt
+      }))
+    });
+
+    if (profileResponse.data.success) {
+      const userProfileData = profileResponse.data.data;
+      const userProfileVector = userProfileData.userProfile || {};
+      const userProfileSize = userProfileData.userProfileSize || 0;
+
+      // 3. UserProfile 컬렉션에 저장 (Python에서 받은 TF-IDF 벡터 저장)
+      await UserProfile.findOneAndUpdate(
+        { userId },
+        {
+          profileVector: userProfileVector,  // TF-IDF 벡터 저장
+          lastUpdated: new Date(),
+          musicCount: playedHistory.length,
+        },
+        { upsert: true, new: true }
+      );
+
+      console.log(`[Profile] 프로필 업데이트 완료 - ${userProfileSize}개 단어, 벡터 크기: ${Object.keys(userProfileVector).length}`);
+
+      res.status(200).json({
+        success: true,
+        message: "사용자 프로필이 업데이트되었습니다.",
+        data: {
+          musicCount: playedHistory.length,
+          profileSize: userProfileSize,
+          vectorSize: Object.keys(userProfileVector).length
+        }
+      });
+    } else {
+      throw new Error("프로필 생성 실패");
+    }
+  } catch (error) {
+    console.error(`[Profile] 프로필 업데이트 실패:`, error.message);
+
+    res.status(500).json({
+      success: false,
+      message: "프로필 업데이트에 실패했습니다.",
+    });
+  }
+});
+
 module.exports = {
     getIndex,
     getMusic,
@@ -240,4 +476,5 @@ module.exports = {
     recommendMusic,
     loadMore,
     saveMusic,
+    updateUserProfile,
 };

@@ -4,6 +4,7 @@ const User = require('./User');
 const Emotion = require('./Emotion');
 const MusicHistory = require('./MusicHistory');
 const Question = require('./Question');
+const UserProfile = require('./UserProfile');
 
 const connectDB = async () => {
   try {
@@ -23,5 +24,6 @@ module.exports = {
   User,
   Emotion,
   MusicHistory,
-  Question
+  Question,
+  UserProfile
 };

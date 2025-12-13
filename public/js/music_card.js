@@ -13,6 +13,11 @@ let isPlaying = false;
 let isLoadingMore = false;
 let savedVideoIds = new Set(); // 저장된 곡 ID 목록
 
+// 30초 재생 체크
+let playStartTime = null;
+let has30SecondsPassed = false;
+let check30SecondsTimer = null;
+
 // UI 요소
 const hamburgerMenu = document.getElementById('hamburgerMenu');
 const listSectionOverlay = document.getElementById('listSectionOverlay');
@@ -174,6 +179,7 @@ function onPlayerStateChange(event) {
     isPlaying = true;
     playBtn.innerHTML = '<i class="fas fa-pause"></i>';
     startProgressTracking();
+    start30SecondCheck();
   }
 
   // 일시정지
@@ -182,12 +188,69 @@ function onPlayerStateChange(event) {
     isPlaying = false;
     playBtn.innerHTML = '<i class="fas fa-play"></i>';
     stopProgressTracking();
+    stop30SecondCheck();
   }
 
   // 재생 종료
   if (event.data === YT.PlayerState.ENDED) {
     console.log('[YouTube] 곡 종료');
+    stop30SecondCheck();
     onSongEnded();
+  }
+}
+
+// 30초 재생 체크 시작
+function start30SecondCheck() {
+  // 기존 타이머 취소
+  stop30SecondCheck();
+
+  // 재생 시작 시간 기록
+  playStartTime = Date.now();
+  has30SecondsPassed = false;
+
+  console.log('[30s Check] 재생 시작 - 30초 타이머 시작');
+
+  // 30초 후 실행
+  check30SecondsTimer = setTimeout(() => {
+    has30SecondsPassed = true;
+    console.log('[30s Check] 30초 경과 - 사용자 취향 업데이트 대상');
+
+    // 30초 이상 재생했음을 표시 (사용자 프로필 업데이트용)
+    markAs30SecondsPlayed(songs[currentIndex]);
+  }, 30000); // 30초
+}
+
+// 30초 재생 체크 중지
+function stop30SecondCheck() {
+  if (check30SecondsTimer) {
+    clearTimeout(check30SecondsTimer);
+    check30SecondsTimer = null;
+    console.log('[30s Check] 타이머 취소');
+  }
+}
+
+// 30초 이상 재생한 곡으로 표시
+async function markAs30SecondsPlayed(song) {
+  if (!song) return;
+
+  console.log(`[30s Check] 30초 이상 재생: ${song.title}`);
+
+  // 사용자 프로필 업데이트 API 호출
+  try {
+    const response = await fetch('/api/music/update-profile', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' }
+    });
+
+    const data = await response.json();
+
+    if (response.ok) {
+      console.log(`[30s Check] 프로필 업데이트 완료:`, data.data);
+    } else {
+      console.warn(`[30s Check] 프로필 업데이트 실패:`, data.message);
+    }
+  } catch (error) {
+    console.error('[30s Check] 프로필 업데이트 오류:', error);
   }
 }
 
@@ -440,7 +503,7 @@ function startProgressTracking() {
     progressFill.style.width = `${percentage}%`;
     
     // 끝에서 3곡 남았을 때 추가 로딩
-    if (currentIndex >= songs.length - 3 && !isLoadingMore) {
+    if (currentIndex >= songs.length - 5 && !isLoadingMore) {
       console.log('[Player] 추가 로딩 트리거');
       loadMoreMusic();
     }

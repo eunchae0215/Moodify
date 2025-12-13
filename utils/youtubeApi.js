@@ -48,8 +48,10 @@ const getVideoDetails = async (videoIds) => {
       videoId: item.id,
       duration: parseDuration(item.contentDetails.duration),
       title: item.snippet.title,
+      description: item.snippet.description || '',
       channelTitle: item.snippet.channelTitle,
-      thumbnailUrl: item.snippet.thumbnails.high.url
+      thumbnailUrl: item.snippet.thumbnails.high.url,
+      tags: item.snippet.tags || []
     }));
   } catch (error) {
     console.error('비디오 상세 정보 조회 실패:', error.message);
@@ -99,20 +101,32 @@ const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
     // 2단계: 비디오 상세 정보 조회 (duration 포함)
     const videoDetails = await getVideoDetails(videoIds);
 
-    // 3단계: 5분 이하 필터링 + 필요한 정보만 추출
+    // 3단계: Shorts 제외 (60초 이하) + 5분 이하 필터링 + 필요한 정보만 추출
     const filteredVideos = videoDetails
-      .filter(video => video.duration > 0 && video.duration <= maxDuration)
+      .filter(video => {
+        // Shorts 제외: 60초 초과 영상만 허용
+        if (video.duration <= 60) {
+          return false;
+        }
+        // 최대 길이 제한 (기본 5분)
+        if (video.duration > maxDuration) {
+          return false;
+        }
+        return video.duration > 0;
+      })
       .slice(0, maxResults) // 최종 결과 수 제한
       .map(video => ({
         videoId: video.videoId,
         title: video.title,
+        description: video.description,
         channelTitle: video.channelTitle,
         thumbnailUrl: video.thumbnailUrl,
         duration: video.duration,
-        durationFormatted: formatDuration(video.duration)
+        durationFormatted: formatDuration(video.duration),
+        tags: video.tags
       }));
 
-    console.log(`[YouTube API] "${keyword}" 검색 완료: ${filteredVideos.length}개`);
+    console.log(`[YouTube API] "${keyword}" 검색 완료: ${filteredVideos.length}개 (Shorts 제외)`);
     return filteredVideos;
 
   } catch (error) {

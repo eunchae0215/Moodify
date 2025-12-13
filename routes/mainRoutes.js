@@ -24,5 +24,6 @@ router.post("/api/emotions", requireAuth, mainController.saveEmotion);
 router.post("/api/music/recommend", requireAuth, mainController.recommendMusic);
 router.post("/api/music/load-more", requireAuth, mainController.loadMore);
 router.post("/api/music/save", requireAuth, mainController.saveMusic);
+router.post("/api/music/update-profile", requireAuth, mainController.updateUserProfile);
 
 module.exports = router;

@@ -2,11 +2,70 @@ const express = require('express');
 const dbConnect = require('./config/dbConnect');
 const methodOverride = require("method-override");
 const cookieParser = require("cookie-parser");
+const { spawn } = require('child_process');
 require("dotenv").config();
 
 const path = require('path');
 const app = express();
 const PORT = 3000;
+
+// Python 추천 서버 프로세스
+let pythonProcess = null;
+
+// Python 추천 서버 시작
+function startPythonServer() {
+  console.log('='.repeat(60));
+  console.log('🐍 Python 추천 서버 시작 중...');
+  console.log('='.repeat(60));
+
+  const pythonScriptPath = path.join(__dirname, 'utils', 'recommendation_service.py');
+
+  // Python 프로세스 실행
+  pythonProcess = spawn('python', [pythonScriptPath]);
+
+  // Python 서버 출력 (stdout)
+  pythonProcess.stdout.on('data', (data) => {
+    console.log(`[Python Server] ${data.toString().trim()}`);
+  });
+
+  // Python 서버 에러 (stderr)
+  pythonProcess.stderr.on('data', (data) => {
+    console.error(`[Python Server Error] ${data.toString().trim()}`);
+  });
+
+  // Python 서버 종료
+  pythonProcess.on('close', (code) => {
+    console.log(`[Python Server] 종료됨 (코드: ${code})`);
+    pythonProcess = null;
+  });
+
+  console.log('[Python Server] 프로세스 시작됨 (PID:', pythonProcess.pid, ')');
+}
+
+// Python 서버 중지
+function stopPythonServer() {
+  if (pythonProcess) {
+    console.log('[Python Server] 종료 중...');
+    pythonProcess.kill();
+    pythonProcess = null;
+  }
+}
+
+// Node.js 종료 시 Python 서버도 종료
+process.on('SIGINT', () => {
+  console.log('\n[Server] 서버 종료 중...');
+  stopPythonServer();
+  process.exit(0);
+});
+
+process.on('SIGTERM', () => {
+  console.log('\n[Server] 서버 종료 중...');
+  stopPythonServer();
+  process.exit(0);
+});
+
+// Python 서버 시작
+startPythonServer();
 
 dbConnect();
 

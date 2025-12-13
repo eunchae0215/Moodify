@@ -15,7 +15,7 @@ const emotionKeywords = {
   },
   sleep: {
     en: ['relaxing music', 'calm music', 'sleep music', 'peaceful music', 'meditation music'],
-    ko: ['잔잔한 음악', '편안한 노래', '수면 음악', '힐링 음악', '명상 음악'],
+    ko: ['잔잔한 음악', '편안한 노래', '수면 음악', '조용한 노래', '명상 음악'],
     ja: ['リラックス音楽', '癒しの音楽', '睡眠音楽', '穏やかな音楽', '瞑想音楽']
   },
   crying: {
