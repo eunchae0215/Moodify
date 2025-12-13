@@ -2,12 +2,9 @@ const asyncHandler = require("express-async-handler");
 const Emotion = require("../models/Emotion");
 const MusicHistory = require("../models/MusicHistory");
 const UserProfile = require("../models/UserProfile");
-const { getMultilingualKeywordsBatch } = require("../utils/emotionMapper");
 const { searchMultipleKeywords, loadMoreMusic } = require("../utils/youtubeApi");
-const axios = require("axios");
-
-// Python 추천 서버 URL
-const RECOMMENDATION_API_URL = process.env.RECOMMENDATION_API_URL || "http://localhost:5000";
+const { generateKeywords, getRecommendations } = require("../utils/recommendationHelper");
+const { MUSIC } = require("../config/constants");
 
 //@desc Get index page
 //@route GET /index
@@ -123,95 +120,28 @@ const recommendMusic = asyncHandler(async (req, res) => {
   const playedHistory = await MusicHistory.find({ userId })
     .populate('emotionId', 'emotion')  // emotion 정보 가져오기
     .sort({ playedAt: -1 })
-    .limit(20)
+    .limit(MUSIC.HISTORY_LIMIT)
     .select('youtubeVideoId videoTitle channelTitle playedAt emotionId')
     .lean();
 
   console.log(`[Music] 재생 기록: ${playedHistory.length}개`);
 
-  // 2. 키워드 생성 (재생 기록이 5개 이상이면 Python에서 생성, 아니면 기본 키워드)
-  let keywords = [];
-
-  if (playedHistory.length >= 5) {
-    // Python에서 맞춤 키워드 생성
-    try {
-      const keywordResponse = await axios.post(`${RECOMMENDATION_API_URL}/generate-keywords`, {
-        emotion: emotion,
-        playedHistory: playedHistory.map(music => ({
-          videoId: music.youtubeVideoId,
-          title: music.videoTitle,
-          channelTitle: music.channelTitle,
-          playedAt: music.playedAt,
-          emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
-        }))
-      });
-
-      if (keywordResponse.data.success && keywordResponse.data.data.keywords.length > 0) {
-        keywords = keywordResponse.data.data.keywords;
-        console.log(`[Music] Python 맞춤 키워드 생성 완료:`, keywords);
-      } else {
-        // Python에서 빈 배열 반환 시 기본 키워드 사용
-        keywords = getMultilingualKeywordsBatch(emotion, 2);
-        console.log(`[Music] Python 키워드 생성 실패 - 기본 키워드 사용:`, keywords);
-      }
-    } catch (error) {
-      console.error(`[Music] Python 키워드 생성 실패:`, error.message);
-      keywords = getMultilingualKeywordsBatch(emotion, 2);
-      console.log(`[Music] 기본 키워드 사용:`, keywords);
-    }
-  } else {
-    // 재생 기록이 부족하면 기본 다국어 키워드 사용
-    keywords = getMultilingualKeywordsBatch(emotion, 2);
-    console.log(`[Music] 재생 기록 부족 - 기본 키워드 사용:`, keywords);
-  }
+  // 2. 키워드 생성 (재생 기록 기반 맞춤형 또는 기본 키워드)
+  const keywords = await generateKeywords(emotion, playedHistory);
 
   // 3. YouTube 검색 (키워드당 결과 수 계산)
   const resultsPerKeyword = Math.ceil(count / keywords.length);
   const candidateMusic = await searchMultipleKeywords(
     keywords,
     resultsPerKeyword,
-    300, // 5분 이하
+    MUSIC.MAX_DURATION,
     [] // 제외할 비디오 없음
   );
 
   console.log(`[Music] 검색 완료: ${candidateMusic.length}개`);
 
   // 4. Python 추천 서버 호출
-  let musicList = candidateMusic;
-
-  try {
-    const recommendResponse = await axios.post(`${RECOMMENDATION_API_URL}/recommend`, {
-      userId: userId,
-      emotion: emotion,  // 현재 감정 전달
-      candidateMusic: candidateMusic.map(music => ({
-        videoId: music.videoId,
-        title: music.title,
-        description: music.description || '',
-        channelTitle: music.channelTitle,
-        thumbnailUrl: music.thumbnailUrl,
-        duration: music.duration,
-        tags: music.tags || []
-      })),
-      playedHistory: playedHistory.map(music => ({
-        videoId: music.youtubeVideoId,
-        title: music.videoTitle,
-        channelTitle: music.channelTitle,
-        playedAt: music.playedAt,
-        emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
-      }))
-    });
-
-    if (recommendResponse.data.success) {
-      // 추천 결과 사용 (유사도 점수 포함)
-      musicList = recommendResponse.data.data.recommendedMusic;
-      console.log(`[Music] 추천 서버 응답 성공 - ${musicList.length}개 정렬됨`);
-    } else {
-      console.warn(`[Music] 추천 서버 응답 실패 - 원본 순서 사용`);
-    }
-  } catch (error) {
-    console.error(`[Music] 추천 서버 호출 실패:`, error.message);
-    console.log(`[Music] 원본 순서 사용`);
-  }
+  const musicList = await getRecommendations(userId, emotion, candidateMusic, playedHistory);
 
   // 5. 결과 반환
   res.status(200).json({
@@ -246,84 +176,20 @@ const loadMore = asyncHandler(async (req, res) => {
   const playedHistory = await MusicHistory.find({ userId })
     .populate('emotionId', 'emotion')  // emotion 정보 가져오기
     .sort({ playedAt: -1 })
-    .limit(20)
+    .limit(MUSIC.HISTORY_LIMIT)
     .select('youtubeVideoId videoTitle channelTitle playedAt emotionId')
     .lean();
 
-  // 2. 키워드 생성 (재생 기록이 5개 이상이면 Python에서 생성, 아니면 기본 키워드)
-  let keywords = [];
-
-  if (playedHistory.length >= 5) {
-    // Python에서 맞춤 키워드 생성
-    try {
-      const keywordResponse = await axios.post(`${RECOMMENDATION_API_URL}/generate-keywords`, {
-        emotion: emotion,
-        playedHistory: playedHistory.map(music => ({
-          videoId: music.youtubeVideoId,
-          title: music.videoTitle,
-          channelTitle: music.channelTitle,
-          playedAt: music.playedAt,
-          emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
-        }))
-      });
-
-      if (keywordResponse.data.success && keywordResponse.data.data.keywords.length > 0) {
-        keywords = keywordResponse.data.data.keywords;
-        console.log(`[Music] Python 맞춤 키워드 생성 완료:`, keywords);
-      } else {
-        keywords = getMultilingualKeywordsBatch(emotion, 2);
-        console.log(`[Music] Python 키워드 생성 실패 - 기본 키워드 사용:`, keywords);
-      }
-    } catch (error) {
-      console.error(`[Music] Python 키워드 생성 실패:`, error.message);
-      keywords = getMultilingualKeywordsBatch(emotion, 2);
-      console.log(`[Music] 기본 키워드 사용:`, keywords);
-    }
-  } else {
-    keywords = getMultilingualKeywordsBatch(emotion, 2);
-    console.log(`[Music] 재생 기록 부족 - 기본 키워드 사용:`, keywords);
-  }
+  // 2. 키워드 생성 (재생 기록 기반 맞춤형 또는 기본 키워드)
+  const keywords = await generateKeywords(emotion, playedHistory);
 
   // 3. 추가 음악 검색 (이미 재생한 곡 제외)
-  const candidateMusic = await loadMoreMusic(emotion, keywords, excludeVideoIds, count, 300);
+  const candidateMusic = await loadMoreMusic(emotion, keywords, excludeVideoIds, count, MUSIC.MAX_DURATION);
 
   console.log(`[Music] 추가 로딩 완료: ${candidateMusic.length}개`);
 
   // 4. Python 추천 서버 호출
-  let musicList = candidateMusic;
-
-  try {
-    const recommendResponse = await axios.post(`${RECOMMENDATION_API_URL}/recommend`, {
-      userId: userId,
-      emotion: emotion,  // 현재 감정 전달
-      candidateMusic: candidateMusic.map(music => ({
-        videoId: music.videoId,
-        title: music.title,
-        description: music.description || '',
-        channelTitle: music.channelTitle,
-        thumbnailUrl: music.thumbnailUrl,
-        duration: music.duration,
-        tags: music.tags || []
-      })),
-      playedHistory: playedHistory.map(music => ({
-        videoId: music.youtubeVideoId,
-        title: music.videoTitle,
-        channelTitle: music.channelTitle,
-        playedAt: music.playedAt,
-        emotion: music.emotionId?.emotion || 'unknown'  // 감정 정보 추가
-      }))
-    });
-
-    if (recommendResponse.data.success) {
-      musicList = recommendResponse.data.data.recommendedMusic;
-      console.log(`[Music] 추가 로딩 추천 완료 - ${musicList.length}개 정렬됨`);
-    } else {
-      console.warn(`[Music] 추천 서버 응답 실패 - 원본 순서 사용`);
-    }
-  } catch (error) {
-    console.error(`[Music] 추천 서버 호출 실패:`, error.message);
-    console.log(`[Music] 원본 순서 사용`);
-  }
+  const musicList = await getRecommendations(userId, emotion, candidateMusic, playedHistory);
 
   res.status(200).json({
     success: true,

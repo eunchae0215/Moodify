@@ -7,6 +7,7 @@
  */
 
 const axios = require('axios');
+const { MUSIC } = require('../config/constants');
 
 const YOUTUBE_API_BASE_URL = 'https://www.googleapis.com/youtube/v3';
 const YOUTUBE_API_KEY = process.env.YOUTUBE_API_KEY;
@@ -66,7 +67,7 @@ const getVideoDetails = async (videoIds) => {
  * @param {number} maxDuration - 최대 길이(초) (기본값: 300 = 5분)
  * @returns {Promise<Object[]>} 음악 정보 배열
  */
-const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
+const searchMusic = async (keyword, maxResults = 10, maxDuration = MUSIC.MAX_DURATION) => {
   try {
     console.log(`[YouTube API] 검색 시작: "${keyword}", 최대 ${maxResults}개`);
     
@@ -104,8 +105,8 @@ const searchMusic = async (keyword, maxResults = 10, maxDuration = 300) => {
     // 3단계: Shorts 제외 (60초 이하) + 5분 이하 필터링 + 필요한 정보만 추출
     const filteredVideos = videoDetails
       .filter(video => {
-        // Shorts 제외: 60초 초과 영상만 허용
-        if (video.duration <= 60) {
+        // Shorts 제외: SHORTS_THRESHOLD 초과 영상만 허용
+        if (video.duration <= MUSIC.SHORTS_THRESHOLD) {
           return false;
         }
         // 최대 길이 제한 (기본 5분)
@@ -166,7 +167,7 @@ const formatDuration = (seconds) => {
  * @param {string[]} excludeVideoIds - 제외할 비디오 ID 배열 (중복 방지용)
  * @returns {Promise<Object[]>} 음악 정보 배열
  */
-const searchMultipleKeywords = async (keywords, resultsPerKeyword = 10, maxDuration = 300, excludeVideoIds = []) => {
+const searchMultipleKeywords = async (keywords, resultsPerKeyword = 10, maxDuration = MUSIC.MAX_DURATION, excludeVideoIds = []) => {
   try {
     console.log(`[YouTube API] 다중 키워드 검색 시작: ${keywords.length}개 키워드`);
     console.log(`[YouTube API] 제외할 비디오: ${excludeVideoIds.length}개`);
@@ -216,7 +217,7 @@ const searchMultipleKeywords = async (keywords, resultsPerKeyword = 10, maxDurat
  * @param {number} maxDuration - 최대 길이(초)
  * @returns {Promise<Object[]>} 추가 음악 정보 배열
  */
-const loadMoreMusic = async (emotion, keywords, excludeVideoIds = [], count = 30, maxDuration = 300) => {
+const loadMoreMusic = async (emotion, keywords, excludeVideoIds = [], count = 30, maxDuration = MUSIC.MAX_DURATION) => {
   try {
     console.log(`[YouTube API] 추가 음악 로딩: ${emotion}, ${count}개 요청`);
     
