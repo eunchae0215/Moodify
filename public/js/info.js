@@ -64,8 +64,6 @@ async function updateUserInfo(username, password, passwordConfirm) {
       const nicknameInput = document.getElementById('nickname');
       nicknameInput.value = data.data.username;
       nicknameInput.defaultValue = data.data.username;
-
-      console.log('[Info] 닉네임이 수정되었습니다:', data.data.username);
     } else {
       // 실패 메시지 표시
       alert(data.message || '정보 수정에 실패했습니다.');

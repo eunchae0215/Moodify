@@ -61,14 +61,12 @@ function loadSong(index) {
     albumPlaceholder.style.display = 'flex';
   }
 
-  // YouTube Player에 비디오 로드 (자동재생 설정에 따라)
+  // YouTube Player에 비디오 로드
   if (player && isPlayerReady && song.videoId) {
     console.log('[YouTube] 비디오 로드:', song.videoId);
     if (isAutoPlayEnabled()) {
-      console.log('[YouTube] 자동재생 활성화 - loadVideoById 사용');
       player.loadVideoById(song.videoId);
     } else {
-      console.log('[YouTube] 자동재생 비활성화 - cueVideoById 사용');
       player.cueVideoById(song.videoId);
     }
   }
