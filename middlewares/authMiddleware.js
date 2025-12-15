@@ -31,12 +31,8 @@ const requireAuth = asyncHandler(async (req, res, next) => {
     req.userID = decoded.userID;
     req.username = decoded.username;
 
-    console.log(`[Auth API] 인증 성공: ${req.username} (${req.userId})`);
-
     next();
   } catch (error) {
-    console.error("[Auth API] 토큰 검증 실패:", error.message);
-
     return res.status(401).json({
       success: false,
       message: "유효하지 않은 토큰입니다.",
@@ -63,7 +59,7 @@ const optionalAuth = (req, res, next) => {
     req.userID = decoded.userID;
     req.username = decoded.username;
   } catch (error) {
-    console.log("[Auth API] 토큰 검증 실패 (선택적 인증)");
+    console.log("실패");
   }
 
   next();

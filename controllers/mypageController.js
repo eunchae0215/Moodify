@@ -34,7 +34,7 @@ const updateInfo = asyncHandler(async (req, res) => {
     const { username, password, password2 } = req.body;
     const userId = req.user.id;
 
-    // 비밀번호 확인 (비밀번호 변경하는 경우에만)
+    // 비밀번호 확인
     if (password) {
         if (password !== password2) {
             return res.status(400).json({
@@ -124,8 +124,6 @@ const getQna = asyncHandler(async (req, res) => {
 const getEmotionHistory = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { startDate, endDate, emotion } = req.query;
-
-  // 쿼리 조건 생성
   const query = { userId };
 
   if (startDate || endDate) {
@@ -156,15 +154,13 @@ const getEmotionHistory = asyncHandler(async (req, res) => {
 const getMusicHistory = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { emotionId } = req.query;
-
-  // 쿼리 조건 생성
   const query = { userId };
 
   if (emotionId) {
     query.emotionId = emotionId;
   }
 
-  // 음악 히스토리 조회 (모든 데이터)
+  // 음악 히스토리 조회 
   const musicHistory = await MusicHistory.find(query)
     .sort({ playedAt: -1 })
     .populate("emotionId", "emotion emoji createdAt");
@@ -199,8 +195,6 @@ const submitQna = asyncHandler(async (req, res) => {
         content: content.trim()
     });
 
-    console.log(`[QnA] 새 문의 등록: ${req.user.username} (${req.user.userID})`);
-
     res.status(201).json({
         success: true,
         message: "문의가 성공적으로 전송되었습니다!",
@@ -219,8 +213,6 @@ const deleteAccount = asyncHandler(async (req, res) => {
     const username = req.user.username;
     const userID = req.user.userID;
 
-    console.log(`[탈퇴 시작] 사용자: ${username} (${userID})`);
-
     try {
         // 1. 감정 기록 삭제
         const emotionResult = await Emotion.deleteMany({ userId });
@@ -234,7 +226,7 @@ const deleteAccount = asyncHandler(async (req, res) => {
         const qnaResult = await Question.deleteMany({ userId });
         console.log(`  - Q&A 삭제: ${qnaResult.deletedCount}개`);
 
-        // 4. 사용자 계정 삭제 (마지막)
+        // 4. 사용자 계정 삭제
         const deletedUser = await User.findByIdAndDelete(userId);
 
         if (!deletedUser) {
@@ -266,7 +258,6 @@ const saveFavorite = asyncHandler(async (req, res) => {
   const userId = req.user.id;
   const { emotionId, emotion, youtubeVideoId, videoTitle, channelTitle, thumbnailUrl } = req.body;
 
-  // 필수 필드 검증
   if (!emotionId || !emotion || !youtubeVideoId || !videoTitle || !channelTitle || !thumbnailUrl) {
     return res.status(400).json({
       success: false,
@@ -274,8 +265,8 @@ const saveFavorite = asyncHandler(async (req, res) => {
     });
   }
 
+  // 이미 저장된 곡인지 확인
   try {
-    // 이미 저장된 곡인지 확인
     const existingFavorite = await Favorite.findOne({ userId, youtubeVideoId });
 
     if (existingFavorite) {
@@ -319,7 +310,7 @@ const saveFavorite = asyncHandler(async (req, res) => {
   }
 });
 
-// 즐겨찾기 목록 조회 (특정 감정)
+// 즐겨찾기 목록 조회
 // GET /api/favorites?emotion=happy
 const getFavoritesByEmotion = asyncHandler(async (req, res) => {
   const userId = req.user.id;
@@ -409,30 +400,25 @@ const getFavoritesCounts = asyncHandler(async (req, res) => {
   });
 });
 
-// 사용자 프로필 초기화 (추천 시스템 리셋)
+// 사용자 프로필 초기화
 // POST /api/user/reset-profile
 const resetUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user.id;
-
-  console.log(`[Profile Reset] 사용자 프로필 초기화 요청: ${req.user.username} (${req.user.userID})`);
 
   try {
     // UserProfile 삭제
     const UserProfile = require('../models/UserProfile');
     const result = await UserProfile.deleteOne({ userId });
 
-    console.log(`[Profile Reset] UserProfile 삭제 완료: ${result.deletedCount}개`);
-
     res.status(200).json({
       success: true,
-      message: "추천 시스템이 초기화되었습니다. 다음 음악 재생 시 새로운 프로필이 생성됩니다.",
+      message: "추천 시스템이 초기화되었습니다.",
       data: {
         deletedCount: result.deletedCount
       }
     });
 
   } catch (error) {
-    console.error('[Profile Reset] 초기화 실패:', error);
     res.status(500).json({
       success: false,
       message: "프로필 초기화 중 오류가 발생했습니다."

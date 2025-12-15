@@ -1,14 +1,16 @@
 let isUserIDChecked = false;
 let isUserIDAvailable = false;
 
-// DOM이 로드된 후 실행
 document.addEventListener('DOMContentLoaded', () => {
-  // DOM 요소들을 한 번에 선언 (모든 이벤트 리스너에서 사용 가능)
+  // DOM 요소
   const checkButton = document.getElementById('checkDuplicate');
   const userIDInput = document.getElementById('userID');
   const resultSpan = document.getElementById('duplicateResult');
   const signupForm = document.getElementById('signupForm');
   const errorDiv = document.getElementById('errorMessage');
+  const passwordInput = document.getElementById('password');
+  const password2Input = document.getElementById('password2');
+  const passwordResultSpan = document.getElementById('passwordResult');
 
   // 중복 확인 버튼 클릭 이벤트
   if (checkButton) {
@@ -65,33 +67,53 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // 회원가입 폼 제출 
+  // 비밀번호 입력 시 에러 메시지 초기화
+  if (password2Input) {
+    password2Input.addEventListener('input', () => {
+      passwordResultSpan.textContent = '';
+      passwordResultSpan.className = 'check-result';
+    });
+  }
+
+  if (passwordInput) {
+    passwordInput.addEventListener('input', () => {
+      passwordResultSpan.textContent = '';
+      passwordResultSpan.className = 'check-result';
+    });
+  }
+
+  // 회원가입 폼 제출
   if (signupForm) {
     signupForm.addEventListener('submit', (e) => {
+      let hasError = false;
+
       // 중복 확인 여부 체크
       if (!isUserIDChecked) {
-        e.preventDefault();
-        showError('아이디 중복 확인을 해주세요.');
-        return false;
+        resultSpan.textContent = '아이디 중복 확인을 해주세요.';
+        resultSpan.className = 'check-result error';
+        hasError = true;
+      } else if (!isUserIDAvailable) {
+        resultSpan.textContent = '사용할 수 없는 아이디입니다.';
+        resultSpan.className = 'check-result error';
+        hasError = true;
       }
 
-      if (!isUserIDAvailable) {
-        e.preventDefault();
-        showError('사용할 수 없는 아이디입니다.');
-        return false;
-      }
-
-      // 비밀번호 확인
-      const password = document.getElementById('password').value;
-      const password2 = document.getElementById('password2').value;
+      // 비밀번호 확인 (아이디 검증과 독립적으로 체크)
+      const password = passwordInput.value;
+      const password2 = password2Input.value;
 
       if (password !== password2) {
-        e.preventDefault();
-        showError('비밀번호가 일치하지 않습니다.');
-        return;
+        passwordResultSpan.textContent = '비밀번호가 일치하지 않습니다.';
+        passwordResultSpan.className = 'check-result error';
+        hasError = true;
       }
 
-      hideError();
+      // 에러가 있으면 제출 방지
+      if (hasError) {
+        e.preventDefault();
+        return false;
+      }
+
       return true;
     });
   }

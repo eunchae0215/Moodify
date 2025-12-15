@@ -43,14 +43,13 @@ const favoriteSchema = new mongoose.Schema({
   collection: 'favorites'
 });
 
-// 인덱스 설정
 favoriteSchema.index({ userId: 1 });
 favoriteSchema.index({ emotionId: 1 });
 favoriteSchema.index({ emotion: 1 });
 favoriteSchema.index({ userId: 1, emotion: 1 });
 favoriteSchema.index({ userId: 1, savedAt: -1 });
 
-// 중복 방지: 같은 유저가 같은 곡을 중복 저장하지 않도록
+// 중복 방지
 favoriteSchema.index({ userId: 1, youtubeVideoId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Favorite', favoriteSchema);

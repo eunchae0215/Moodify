@@ -11,7 +11,6 @@
   <%- include('../frame/header') %>
 
   <div class="music-page">
-    <!-- 햄버거 메뉴 -->
     <button class="hamburger-menu" id="hamburgerMenu">
       <i class="fas fa-bars"></i>
     </button>
@@ -19,10 +18,8 @@
     <!-- 음악 플레이어 컨테이너 -->
     <div class="music-container">
       
-      <!-- 배경: 고정된 재생 카드 -->
       <div class="player-card-fixed">
         <div class="player-card">
-          <!-- 앨범 아트 (배경) -->
           <div class="album-art-bg" id="albumArtBg">
           </div>
 
@@ -64,23 +61,17 @@
         </div>
       </div>
 
-      <!-- 전면: 3D Carousel 썸네일 -->
       <div class="carousel-container">
-        <div class="carousel-track" id="carouselTrack">
-          <!-- JavaScript로 동적 생성됨 -->
-        </div>
+        <div class="carousel-track" id="carouselTrack"></div>
       </div>
 
-      <!-- 음악 리스트 (오른쪽에서 슬라이드) -->
+      <!-- 음악 리스트 -->
       <div class="list-section-overlay" id="listSectionOverlay">
-        <!-- 닫기 화살표 버튼 -->
         <button class="close-list-btn" id="closeListBtn">
           <i class="fas fa-chevron-right"></i>
         </button>
         
-        <div class="list-scroll-overlay">
-          <!-- JavaScript로 동적 생성됨 -->
-        </div>
+        <div class="list-scroll-overlay"></div>
       </div>
 
     </div>

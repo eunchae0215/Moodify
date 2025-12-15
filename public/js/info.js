@@ -23,7 +23,7 @@ async function handleFormSubmit(e) {
     return;
   }
   
-  // 2. 비밀번호 검증 (입력한 경우에만)
+  // 2. 비밀번호 검증
   if (password || passwordConfirm) {
     // 비밀번호 일치 확인
     if (password !== passwordConfirm) {
@@ -55,25 +55,21 @@ async function updateUserInfo(username, password, passwordConfirm) {
     
     if (data.success) {
       alert('정보가 수정되었습니다.');
-      
+
       // 비밀번호 필드 초기화
       document.getElementById('password').value = '';
       document.getElementById('passwordConfirm').value = '';
-      
-      // 닉네임이 변경된 경우 페이지 새로고침
-      const currentUsername = document.getElementById('nickname').defaultValue;
-      if (data.data.username !== currentUsername) {
-        console.log('닉네임 변경 감지 - 페이지 새로고침');
-        setTimeout(() => {
-          location.reload();
-        }, 500);
-      }
+
+      // 닉네임 input의 value와 defaultValue 모두 업데이트
+      const nicknameInput = document.getElementById('nickname');
+      nicknameInput.value = data.data.username;
+      nicknameInput.defaultValue = data.data.username;
     } else {
       // 실패 메시지 표시
       alert(data.message || '정보 수정에 실패했습니다.');
     }
   } catch (error) {
-    console.error('Error:', error);
+    console.error(error);
     alert('서버와의 통신 중 오류가 발생했습니다.');
   }
 }

@@ -16,10 +16,7 @@ const moodEmojiMap = {
 
 emojiButtons.forEach(button => {
   button.addEventListener('click', () => {
-    // 모든 버튼에서 selected 클래스 제거
     emojiButtons.forEach(btn => btn.classList.remove('selected'));
-    
-    // 클릭한 버튼에 selected 클래스 추가
     button.classList.add('selected');
     
     // 선택한 감정 저장
@@ -33,7 +30,7 @@ emojiButtons.forEach(button => {
   });
 });
 
-// 🆕 음악 들으러 가기 버튼 클릭
+// 음악 들으러 가기 버튼 클릭 시
 musicButton.addEventListener('click', async () => {
   if (!selectedMood) {
     alert('감정을 선택해주세요!');
@@ -47,8 +44,6 @@ musicButton.addEventListener('click', async () => {
   musicButton.style.cursor = 'wait';
   
   try {
-    console.log('[Index] 감정 저장 API 호출 시작');
-    
     // 감정 저장 API 호출
     const response = await fetch('/api/emotions', {
       method: 'POST',
@@ -68,16 +63,13 @@ musicButton.addEventListener('click', async () => {
     if (!response.ok) {
       throw new Error(data.message || '감정 저장에 실패했습니다.');
     }
-    
-    console.log('[Index] 감정 저장 성공:', data);
-    
+
     const emotionId = data.data.emotionId;
     
     // music 페이지로 이동
     window.location.href = `/music?emotion=${selectedMood}&emotionId=${emotionId}`;
     
   } catch (error) {
-    console.error('[Index] 감정 저장 실패:', error);
     alert(`감정 저장에 실패했습니다.\n${error.message}`);
     
     // 버튼 복구

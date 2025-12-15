@@ -46,7 +46,7 @@ router.route("/qna")
 router.get("/api/emotions/history", requireAuth, getEmotionHistory);
 router.get("/api/music/history", requireAuth, getMusicHistory);
 
-// 즐겨찾기 API
+// 즐겨찾기
 router.post("/api/favorites", requireAuth, saveFavorite);
 router.get("/api/favorites", requireAuth, getFavoritesByEmotion);
 router.delete("/api/favorites/:videoId", requireAuth, deleteFavorite);
@@ -56,7 +56,7 @@ router.get("/api/favorites/count", requireAuth, getFavoritesCounts);
 // 회원 탈퇴
 router.post("/withdraw", requireAuth, deleteAccount);
 
-// 사용자 프로필 삭제 (추천 초기화)
+// 사용자 프로필 삭제
 router.post("/api/user/reset-profile", requireAuth, require('../controllers/mypageController').resetUserProfile);
 
 module.exports = router;

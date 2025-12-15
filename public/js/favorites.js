@@ -1,15 +1,11 @@
 // 페이지 로드 시 곡 개수 가져오기
 async function loadFavoritesCounts() {
-  console.log('[Favorites] 곡 개수 로드');
-
   try {
     const response = await fetch('/api/favorites/count');
     const data = await response.json();
 
     if (response.ok && data.success) {
       const counts = data.data;
-      console.log('[Favorites] 곡 개수:', counts);
-
       // 각 폴더 버튼 업데이트
       Object.keys(counts).forEach(emotion => {
         const folder = document.querySelector(`.mood-folder[data-mood="${emotion}"]`);
@@ -28,7 +24,7 @@ async function loadFavoritesCounts() {
       });
     }
   } catch (error) {
-    console.error('[Favorites] 곡 개수 로드 실패:', error);
+    console.error(error);
   }
 }
 
@@ -53,9 +49,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const folder = btn.closest('.mood-folder');
       const mood = folder.dataset.mood;
 
-      console.log(`${mood} 폴더의 음악 목록으로 이동`);
-
-      // 해당 감정의 음악 목록 페이지로 이동 (emotion 파라미터 사용)
+      // 해당 감정의 음악 목록 페이지로 이동
       window.location.href = `/musiclist?emotion=${mood}`;
     });
   });

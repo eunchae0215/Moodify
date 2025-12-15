@@ -48,8 +48,6 @@ const getLatestEmotion = asyncHandler(async (req, res) => {
     });
   }
 
-  console.log(`[Emotion] 최근 감정 조회: ${latestEmotion.emotion} (User: ${req.user.username})`);
-
   res.status(200).json({
     success: true,
     data: {
@@ -67,7 +65,6 @@ const saveEmotion = asyncHandler(async (req, res) => {
   const { emotion, emoji } = req.body;
   const userId = req.user.id;
 
-  // 필수 값 체크
   if (!emotion || !emoji) {
     return res.status(400).json({
       success: false,
@@ -84,8 +81,6 @@ const saveEmotion = asyncHandler(async (req, res) => {
 
   await newEmotion.save();
 
-  console.log(`[Emotion] 감정 저장 완료: ${emotion} (User: ${req.user.username})`);
-
   res.status(201).json({
     success: true,
     message: "감정이 저장되었습니다.",
@@ -98,13 +93,12 @@ const saveEmotion = asyncHandler(async (req, res) => {
   });
 });
 
-// 음악 추천 API (최초 검색)
+// 음악 추천 API 
 // POST /api/music/recommend
 const recommendMusic = asyncHandler(async (req, res) => {
   const { emotion, count = 50 } = req.body;
   const userId = req.user.id;
 
-  // 필수 값 체크
   if (!emotion) {
     return res.status(400).json({
       success: false,
@@ -112,31 +106,27 @@ const recommendMusic = asyncHandler(async (req, res) => {
     });
   }
 
-  console.log(`[Music] 음악 추천 요청: ${emotion}, ${count}개 (User: ${req.user.username})`);
+  console.log("[Music] 음악 추천 요청");
 
-  // 1. 사용자 재생 기록 조회 (30초 이상 들은 음악만)
+  // 1. 사용자 재생 기록 조회
   const playedHistory = await MusicHistory.find({ userId })
-    .populate('emotionId', 'emotion')  // emotion 정보 가져오기
+    .populate('emotionId', 'emotion') 
     .sort({ playedAt: -1 })
     .limit(MUSIC.HISTORY_LIMIT)
     .select('youtubeVideoId videoTitle channelTitle playedAt emotionId')
     .lean();
 
-  console.log(`[Music] 재생 기록: ${playedHistory.length}개`);
-
-  // 2. 키워드 생성 (재생 기록 기반 맞춤형 또는 기본 키워드)
+  // 2. 키워드 생성
   const keywords = await generateKeywords(emotion, playedHistory);
 
-  // 3. YouTube 검색 (키워드당 결과 수 계산)
+  // 3. YouTube 검색
   const resultsPerKeyword = Math.ceil(count / keywords.length);
   const candidateMusic = await searchMultipleKeywords(
     keywords,
     resultsPerKeyword,
     MUSIC.MAX_DURATION,
-    [] // 제외할 비디오 없음
+    [] 
   );
-
-  console.log(`[Music] 검색 완료: ${candidateMusic.length}개`);
 
   // 4. Python 추천 서버 호출
   const musicList = await getRecommendations(userId, emotion, candidateMusic, playedHistory);
@@ -160,7 +150,6 @@ const loadMore = asyncHandler(async (req, res) => {
   const { emotion, excludeVideoIds = [], count = 30 } = req.body;
   const userId = req.user.id;
 
-  // 필수 값 체크
   if (!emotion) {
     return res.status(400).json({
       success: false,
@@ -168,23 +157,19 @@ const loadMore = asyncHandler(async (req, res) => {
     });
   }
 
-  console.log(`[Music] 추가 로딩 요청: ${emotion}, ${count}개, 제외: ${excludeVideoIds.length}개`);
-
   // 1. 사용자 재생 기록 조회
   const playedHistory = await MusicHistory.find({ userId })
-    .populate('emotionId', 'emotion')  // emotion 정보 가져오기
+    .populate('emotionId', 'emotion') 
     .sort({ playedAt: -1 })
     .limit(MUSIC.HISTORY_LIMIT)
     .select('youtubeVideoId videoTitle channelTitle playedAt emotionId')
     .lean();
 
-  // 2. 키워드 생성 (재생 기록 기반 맞춤형 또는 기본 키워드)
+  // 2. 키워드 생성 
   const keywords = await generateKeywords(emotion, playedHistory);
 
-  // 3. 추가 음악 검색 (이미 재생한 곡 제외)
+  // 3. 추가 음악 검색
   const candidateMusic = await loadMoreMusic(emotion, keywords, excludeVideoIds, count, MUSIC.MAX_DURATION);
-
-  console.log(`[Music] 추가 로딩 완료: ${candidateMusic.length}개`);
 
   // 4. Python 추천 서버 호출
   const musicList = await getRecommendations(userId, emotion, candidateMusic, playedHistory);
@@ -206,7 +191,6 @@ const saveMusic = asyncHandler(async (req, res) => {
   const { emotionId, videoId, title, channelTitle, thumbnailUrl } = req.body;
   const userId = req.user.id;
 
-  // 필수 값 체크
   if (!emotionId || !videoId || !title) {
     return res.status(400).json({
       success: false,
@@ -259,10 +243,8 @@ const saveMusic = asyncHandler(async (req, res) => {
 const updateUserProfile = asyncHandler(async (req, res) => {
   const userId = req.user.id;
 
-  console.log(`[Profile] 사용자 프로필 업데이트 요청 (User: ${req.user.username})`);
-
   try {
-    // 1. 최근 재생 기록 조회 (최근 10개)
+    // 1. 최근 재생 기록 조회
     const playedHistory = await MusicHistory.find({ userId })
       .sort({ playedAt: -1 })
       .limit(10)
@@ -276,13 +258,11 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       });
     }
 
-    console.log(`[Profile] 재생 기록: ${playedHistory.length}개`);
-
-    // 2. Python 서버에 프로필 생성 요청 (추천 API 재사용)
+    // 2. Python 서버에 프로필 생성 요청
     // 빈 후보 목록으로 호출하여 사용자 프로필만 생성
     const profileResponse = await axios.post(`${RECOMMENDATION_API_URL}/recommend`, {
       userId: userId,
-      candidateMusic: [], // 빈 배열
+      candidateMusic: [],
       playedHistory: playedHistory.map(music => ({
         videoId: music.youtubeVideoId,
         title: music.videoTitle,
@@ -296,18 +276,16 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       const userProfileVector = userProfileData.userProfile || {};
       const userProfileSize = userProfileData.userProfileSize || 0;
 
-      // 3. UserProfile 컬렉션에 저장 (Python에서 받은 TF-IDF 벡터 저장)
+      // 3. UserProfile 컬렉션에 저장 
       await UserProfile.findOneAndUpdate(
         { userId },
         {
-          profileVector: userProfileVector,  // TF-IDF 벡터 저장
+          profileVector: userProfileVector,  
           lastUpdated: new Date(),
           musicCount: playedHistory.length,
         },
         { upsert: true, new: true }
       );
-
-      console.log(`[Profile] 프로필 업데이트 완료 - ${userProfileSize}개 단어, 벡터 크기: ${Object.keys(userProfileVector).length}`);
 
       res.status(200).json({
         success: true,
@@ -322,8 +300,6 @@ const updateUserProfile = asyncHandler(async (req, res) => {
       throw new Error("프로필 생성 실패");
     }
   } catch (error) {
-    console.error(`[Profile] 프로필 업데이트 실패:`, error.message);
-
     res.status(500).json({
       success: false,
       message: "프로필 업데이트에 실패했습니다.",

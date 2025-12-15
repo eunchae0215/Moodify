@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+
 const musicHistorySchema = new mongoose.Schema({
   userId: {
     type: mongoose.Schema.Types.ObjectId,

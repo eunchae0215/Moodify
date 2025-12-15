@@ -1,4 +1,3 @@
-// DOM 로드 후 실행
 document.addEventListener('DOMContentLoaded', () => {
   // DOM 요소 선언
   const loginForm = document.getElementById('loginForm');
@@ -37,7 +36,7 @@ document.addEventListener('DOMContentLoaded', () => {
     passwordInput.addEventListener('focus', hideError);
   }
 
-  // ===== 로그인 폼 제출 처리 =====
+  // 로그인 폼 제출 처리
   if (loginForm) {
     loginForm.addEventListener('submit', async (e) => {
       e.preventDefault();
@@ -73,17 +72,17 @@ document.addEventListener('DOMContentLoaded', () => {
         if (response.ok) {
           window.location.href = result.redirectUrl || '/music';
         } else {
-          console.log('로그인 실패:', result.message);
+          console.log(result.message);
           showError(result.message || '로그인에 실패했습니다.');
         }
       } catch (error) {
-        console.error('로그인 오류:', error);
+        console.error(error);
         showError('로그인 중 오류가 발생했습니다.');
       }
     });
   }
 
-  // ===== LP판 회전 및 바늘 애니메이션 제어 =====
+  // LP판 회전 및 바늘 애니메이션 제어
   if (loginButton && cdDisc && tonearm) {
     loginButton.addEventListener('mouseenter', () => {
       cdDisc.style.animationPlayState = 'running';

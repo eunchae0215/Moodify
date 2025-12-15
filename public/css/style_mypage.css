@@ -541,7 +541,7 @@ p {
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-  margin-right: 520px;
+  margin-right: 500px;
 }
 
 .history-card-btn i {

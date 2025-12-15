@@ -28,7 +28,7 @@ document.getElementById('qnaForm').addEventListener('submit', async function(e) 
       alert(data.message || '문의 전송에 실패했습니다.');
     }
   } catch (error) {
-    console.error('Q&A 전송 오류:', error);
+    console.error( error);
     alert('문의 전송 중 오류가 발생했습니다.');
   } finally {
     // 버튼 다시 활성화

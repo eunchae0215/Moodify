@@ -15,7 +15,6 @@ let pythonProcess = null;
 // Python 추천 서버 시작
 function startPythonServer() {
   console.log('='.repeat(60));
-  console.log('🐍 Python 추천 서버 시작 중...');
   console.log('='.repeat(60));
 
   const pythonScriptPath = path.join(__dirname, 'utils', 'recommendation_service.py');
@@ -35,17 +34,13 @@ function startPythonServer() {
 
   // Python 서버 종료
   pythonProcess.on('close', (code) => {
-    console.log(`[Python Server] 종료됨 (코드: ${code})`);
     pythonProcess = null;
   });
-
-  console.log('[Python Server] 프로세스 시작됨 (PID:', pythonProcess.pid, ')');
 }
 
 // Python 서버 중지
 function stopPythonServer() {
   if (pythonProcess) {
-    console.log('[Python Server] 종료 중...');
     pythonProcess.kill();
     pythonProcess = null;
   }
@@ -53,13 +48,11 @@ function stopPythonServer() {
 
 // Node.js 종료 시 Python 서버도 종료
 process.on('SIGINT', () => {
-  console.log('\n[Server] 서버 종료 중...');
   stopPythonServer();
   process.exit(0);
 });
 
 process.on('SIGTERM', () => {
-  console.log('\n[Server] 서버 종료 중...');
   stopPythonServer();
   process.exit(0);
 });
@@ -81,7 +74,7 @@ app.use(express.urlencoded({ extended: true }));
 // 쿠키 파서
 app.use(cookieParser());
 
-// method-override 미들웨어 등록(PUT, DELETE 처리) 
+// method-override 미들웨어 등록
 app.use(methodOverride("_method"));
 
 app.use("/", require("./routes/loginRoutes"));

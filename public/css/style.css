@@ -515,7 +515,7 @@ p {
   font-weight: bold;
   cursor: pointer;
   transition: all 0.3s;
-  margin-top: 20px;
+  margin-top: 2px;
   box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
 }
 
@@ -634,17 +634,36 @@ body {
   width: 110px;
   height: 110px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: all 0.3s ease;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  position: relative;
 }
 
 .emoji-button .emoji {
   font-size: 70px;
   line-height: 1;
   transition: transform 0.3s ease;
+}
+
+/* 감정 이름 라벨 */
+.emoji-button .emoji-label {
+  position: absolute;
+  bottom: -35px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 16px;
+  font-weight: bold;
+  color: #DDE7DD;
+  padding: 6px 12px;
+  border-radius: 8px;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
 }
 
 .emoji-button:hover {
@@ -657,9 +676,18 @@ body {
   transform: scale(1.1);
 }
 
+.emoji-button:hover .emoji-label {
+  opacity: 1;
+  bottom: -40px;
+}
+
 .emoji-button.selected {
   background: #151F0F;
   box-shadow: 0 0 0 5px rgba(145, 136, 13, 0.3);
+}
+
+.emoji-button.selected .emoji-label {
+  color: #DDE7DD;
 }
 
 @keyframes bounce {
