@@ -61,9 +61,16 @@ function loadSong(index) {
     albumPlaceholder.style.display = 'flex';
   }
 
-  // YouTube Player에 비디오 로드
+  // YouTube Player에 비디오 로드 (자동재생 설정에 따라)
   if (player && isPlayerReady && song.videoId) {
-    player.loadVideoById(song.videoId);
+    console.log('[YouTube] 비디오 로드:', song.videoId);
+    if (isAutoPlayEnabled()) {
+      console.log('[YouTube] 자동재생 활성화 - loadVideoById 사용');
+      player.loadVideoById(song.videoId);
+    } else {
+      console.log('[YouTube] 자동재생 비활성화 - cueVideoById 사용');
+      player.cueVideoById(song.videoId);
+    }
   }
 
   // 리스트 하이라이트 업데이트
@@ -618,14 +625,18 @@ function onPlayerStateChange(event) {
     }
     stopProgressInterval();
 
-    // 다음 곡 자동 재생
+    // 다음 곡 자동 재생 (자동재생 설정 체크)
     if (currentIndex < songs.length - 1) {
       loadSong(currentIndex + 1);
-      setTimeout(() => {
-        if (player && isPlayerReady) {
-          player.playVideo();
-        }
-      }, 300);
+      if (isAutoPlayEnabled()) {
+        setTimeout(() => {
+          if (player && isPlayerReady) {
+            player.playVideo();
+          }
+        }, 300);
+      } else {
+        console.log('[History] 자동재생 비활성화 - 다음 곡 재생 안 함');
+      }
     }
   }
 }

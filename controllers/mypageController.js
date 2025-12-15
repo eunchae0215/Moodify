@@ -9,10 +9,12 @@ const bcrypt = require("bcrypt");
 //@desc Get mypage
 //@route GET /mypage
 const getMypage = asyncHandler(async (req, res) => {
-    res.render("src/mypage", {
-        username: req.user.username,
-        userID: req.user.userID
-    });
+  const user = await User.findById(req.user.id).select("username userID");
+
+  res.render("src/mypage", {
+    username: user.username,
+    userID: user.userID
+  });
 });
 
 //@desc Get info page
@@ -21,11 +23,13 @@ const getInfo = asyncHandler(async (req, res) => {
     if (!req.user) {
         return res.redirect('/login');
     }
+
+  const user = await User.findById(req.user.id).select("username userID");
     
-    res.render("src/info", {
-        username: req.user.username,
-        userID: req.user.userID
-    });
+  res.render("src/info", {
+    username: user.username,
+    userID: user.userID
+  });
 });
 
 //@desc Update user info
@@ -75,6 +79,12 @@ const updateInfo = asyncHandler(async (req, res) => {
             success: false,
             message: "사용자를 찾을 수 없습니다."
         });
+    }
+
+    // 세션 정보도 업데이트 (마이페이지에서 즉시 반영되도록)
+    req.user.username = updatedUser.username;
+    if (password) {
+        req.user.password = updatedUser.password;
     }
 
     res.status(200).json({
